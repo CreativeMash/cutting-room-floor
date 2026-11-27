@@ -180,10 +180,26 @@
   .updbar { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin: 0 0 18px; padding: 10px 10px 10px 18px; border-radius: 999px; background: var(--bg); font-weight: 500; width: fit-content; }
   .intro { padding: clamp(20px, 3vw, 44px) 0 clamp(28px, 3vw, 44px); }
   .intro h1 { max-width: 16ch; }
+  /* the Creative Mash shapes: random on each visit, new ones on every click */
+  .intro.hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: clamp(32px, 5vw, 80px); align-items: center; }
+  .orns { --cell: clamp(54px, 6.2vw, 92px); display: grid; grid-template-columns: repeat(4, var(--cell)); grid-auto-rows: var(--cell); gap: 10px; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 12px; }
+  .orns:focus-visible { outline: 2px solid var(--ink); outline-offset: 10px; }
+  .orn { display: block; width: 100%; height: 100%; transition: opacity .2s var(--ease), transform .2s var(--ease); }
+  .orn.out { opacity: 0; transform: scale(.55); }
+  .orn.blank { background: none; }
+  .orn.circle { border-radius: 50%; }
+  .orn.q-tl { border-top-left-radius: 100%; } .orn.q-tr { border-top-right-radius: 100%; }
+  .orn.q-bl { border-bottom-left-radius: 100%; } .orn.q-br { border-bottom-right-radius: 100%; }
+  .orn.t-tl { clip-path: polygon(0 0, 100% 0, 0 100%); } .orn.t-tr { clip-path: polygon(0 0, 100% 0, 100% 100%); }
+  .orn.t-bl { clip-path: polygon(0 0, 100% 100%, 0 100%); } .orn.t-br { clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+  .orn.half-up { height: 50%; align-self: end; border-radius: 9999px 9999px 0 0; }
+  .orn.half-right { width: 50%; border-radius: 0 9999px 9999px 0; }
   .credit { margin: 0; padding: 28px 0 0; border-top: 1px solid var(--rule); font: 400 13px var(--mono); color: var(--muted); }
   .credit a { color: var(--ink); text-underline-offset: 3px; }
   a.home { display: block; color: inherit; }
   @media (max-width: 900px) {
+    .intro.hero { display: block; } .orns { display: none; }
+    .updbar { display: grid; grid-template-columns: auto 1fr; gap: 10px 12px; border-radius: 18px; padding: 14px 16px; width: auto; } .updbar .dot { margin-top: 7px; } .updbar button { grid-column: 2; justify-self: start; }
     .crumb { display: none; } header.top .wrap { gap: 8px; }
     .cards, .cards.two { grid-template-columns: 1fr; } .bold { min-height: 220px; }
     .facts { grid-template-columns: 1fr 1fr; } .facts div:nth-child(3) { padding-left: 0; border-left: 0; }
@@ -315,10 +331,10 @@ async function openSetup(settings) {
         <span><b>Check each time I open Cutting Room Floor.</b> This only asks GitHub for the latest version number. Nothing about your files leaves your ${esc(OS.computer)}.</span></label>
     </section>
     ${credit()}` : `
-    <div class="intro">
+    <div class="intro hero"><div>
       <h1>Which folders should we look at?</h1>
       <p class="lead">Tick where you keep your projects. Only ticked folders are read, and nothing leaves your ${esc(OS.computer)}.</p>
-    </div>
+    </div>${orns()}</div>
     <section class="block">${folders}</section>
     ${credit()}`;
 
@@ -380,6 +396,42 @@ async function openSetup(settings) {
 }
 $("#settings").onclick = () => openSetup(true);
 
+// ---- the Creative Mash shapes ----
+// A new random set on each visit; click (or press Enter on) the shapes for a new set.
+// The set is kept between redraws, so filtering the list doesn't reshuffle them.
+const SHAPES = ["circle", "q-tl", "q-tr", "q-bl", "q-br", "t-tl", "t-tr", "t-bl", "t-br", "half-up", "half-right"];
+const FILLS = ["--g-blue", "--g-pink", "--g-orange", "--g-green", "--g-yellow", "--g-purple", "--g-sky", "--g-navy"];
+const anyOf = a => a[Math.floor(Math.random() * a.length)];
+function shapeSet(prev) {
+  let set;
+  do {
+    set = Array.from({ length: 12 }, (_, i) => {
+      if (Math.random() < 0.25) return null;
+      let c;
+      do { c = { s: anyOf(SHAPES), f: anyOf(FILLS) }; } while (prev && prev[i] && prev[i].s === c.s && prev[i].f === c.f);
+      return c;
+    });
+  } while (set.filter(Boolean).length < 7 || set.filter(Boolean).length > 10);
+  return set;
+}
+let ORN = shapeSet();
+const ornClass = c => "orn " + (c ? c.s : "blank");
+const ornStyle = c => c ? `background:var(${c.f})` : "";
+const orns = () => `<button class="orns" type="button" aria-label="Shuffle the shapes" title="Click for new shapes">${ORN.map(c => `<span class="${ornClass(c)}" style="${ornStyle(c)}"></span>`).join("")}</button>`;
+function shuffle(box) {
+  ORN = shapeSet(ORN);
+  [...box.children].forEach((cell, i) => setTimeout(() => {
+    cell.classList.add("out");
+    setTimeout(() => {
+      cell.className = ornClass(ORN[i]) + " out";
+      cell.setAttribute("style", ornStyle(ORN[i]));
+      void cell.offsetWidth;
+      cell.classList.remove("out");
+    }, 200);
+  }, i * 35));
+}
+$("#app").addEventListener("click", e => { const box = e.target.closest(".orns"); if (box) shuffle(box); });
+
 // ---- updates: never installed from here, only explained ----
 const cmd = c => `<div class="cmd"><code>${esc(c)}</code><button class="pill ghost sm" data-copy="${esc(c)}">Copy</button></div>`;
 function updBox(u) {
@@ -433,12 +485,12 @@ function render() {
   const hasCaches = D.items.some(i => i.kind === "cache");
 
   $("#app").innerHTML = `
-    <div class="intro">
+    <div class="intro hero"><div>
       ${UPD && UPD.newer ? `<p class="updbar">${dot("--g-pink")}Version ${esc(UPD.latest)} of Cutting Room Floor is available<button class="pill ring sm" id="seeUpd">See how to update</button></p>` : ""}
       <p class="eyebrow">Scanned ${esc(D.scanned_at)}</p>
       <h1>What’s on your cutting room floor?</h1>
       <p class="lead">Leftover renders, test runs, copies and build files in ${D.roots.map(r => `<code>${esc(tilde(r))}</code>`).join(", ")}${D.caches ? " and your app caches" : ""}. Nothing is removed until you choose it, and anything you remove goes to the ${esc(OS.bin)} first.</p>
-    </div>
+    </div>${orns()}</div>
 
     <div class="facts">
       <div><b>${fmt(D.disk.free)}</b><span>free of ${fmt(D.disk.total)} on this disk</span></div>
