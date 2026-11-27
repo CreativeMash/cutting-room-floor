@@ -30,7 +30,7 @@ claude plugin install cutting-room-floor@creativemash
 
 Type them straight into Terminal, as they are. (Inside a running Claude Code session, after you've typed `claude`, the same thing is `/plugin marketplace add CreativeMash/cutting-room-floor` and `/plugin install cutting-room-floor@creativemash`. Those `/plugin` versions don't work in a plain Terminal or in the desktop app.)
 
-Then start a new session and ask Claude something like *"what's on my cutting room floor?"* or *"what's taking up space in my projects?"*. The first time, Claude suggests folders to scan (the projects you've worked on with Claude, plus usual places like `~/Projects` or `Documents\GitHub`), you tick the ones you want, and it remembers them. Then it opens the page and talks you through what it found.
+Then start a new session and ask Claude in your own words, for example *"my Mac is running out of space"*, *"what can I delete in my projects?"* or *"what's on my cutting room floor?"*. The first time, Claude suggests folders to scan (the projects you've worked on with Claude, plus usual places like `~/Projects` or `Documents\GitHub`), you tick the ones you want, and it remembers them. Then it opens the page and talks you through what it found.
 
 ### Getting updates
 
@@ -60,9 +60,18 @@ python3 skills/cutting-room-floor/cutting_room_floor.py
 py -3 skills\cutting-room-floor\cutting_room_floor.py
 ```
 
-Your browser opens on a folder picker. Tick your project folders, or press **Choose a folder…** to pick one in Finder or Explorer, then press **Start the scan**. The results appear when it's done. Next time it goes straight to the scan. Open **Settings** in the header to change your folders or check for updates. Only ticked folders are scanned; use × on a card to take a folder off the list (suggested folders then stay hidden until you add them again).
+Your browser opens on a folder picker. Tick your project folders, or press **Choose a folder…** to pick one in Finder or Explorer, then press **Start the scan**. The results appear when it's done, and next time it goes straight to the scan.
 
 To update, download the ZIP again and replace the old folder (if you cloned it with Git, run `git pull` instead). Your saved folders are kept.
+
+## Settings
+
+![Settings: your folders and updates](screenshots/03-settings.png)
+
+Open **Settings** in the page's header to:
+
+- **Change your folders.** Only ticked folders are scanned. Add one with **Choose a folder…** (it opens Finder or Explorer) or paste its location. Use × to take a folder off the list; suggested folders then stay hidden until you add them again.
+- **Check for updates.** It asks GitHub for the latest version number, shows what's new, and explains how to update for the way you installed it. It never updates by itself. You can also have it check each time you open Cutting Room Floor.
 
 ## What it looks for
 
@@ -104,6 +113,7 @@ Saved folders live in `~/.config/cutting-room-floor/config.json` on macOS and Li
 
 - Cloud-only files (OneDrive "Files On-Demand", iCloud "Optimise Mac Storage") take no room on your disk, so they count as zero and are never opened, which means they are not downloaded by the scan.
 - Some things can't go to the Trash: anything on a network drive, and on Windows anything on a USB stick or too big for the Recycle Bin. The system would delete those for good, so they are marked "Can't go to the Trash" and can't be ticked.
+- The page only answers requests from itself, on your own computer, with a secret key made fresh each time it starts. Other websites and programs can't read your results or remove anything.
 - Symlinks and Windows junctions are skipped, so nothing is counted twice and the scan never wanders off to another drive.
 - On older macOS versions (before macOS 14), removing uses Finder, which may ask once for permission.
 - On Linux, removing needs `gio` (part of most desktops) or `trash-cli`.

@@ -2,6 +2,11 @@
 
 Each release is listed here, newest first. The Settings page shows the notes for a new version when you check for updates, so keep each entry short and in plain words.
 
+## 1.1.0
+
+- The Creative Mash shapes are back beside the heading. You get a new random set each time, and clicking them shuffles them.
+- New screenshots and a Settings section in the README.
+
 ## 1.0.1
 
 - Claude now recognises everyday requests like "my Mac is running out of space" or "what can I delete?".
