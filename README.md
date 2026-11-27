@@ -34,9 +34,9 @@ Then start a new session and ask Claude in your own words, for example *"my Mac 
 
 ### Getting updates
 
-Updates don't install themselves unless you switch that on. To check, open **Settings** in the page and press **Check for updates**, or just ask Claude to *"update Cutting Room Floor"*.
+Updates don't install themselves unless you switch that on. To check, open **Settings** in the page and press **Check for updates**, or just ask Claude to *"update Cutting Room Floor"*. If there's a new version, press **Update now**: the page runs the update and shows what it's doing, then **Restart Cutting Room Floor** starts the new version and reloads the page.
 
-To update by hand, run these two in Terminal (or PowerShell), in this order, then start a new Claude session. The first gets the latest list of versions; the second installs the newest one.
+To update by hand instead, run these two in Terminal (or PowerShell), in this order, then start a new Claude session. The first gets the latest list of versions; the second installs the newest one.
 
 ```bash
 claude plugin marketplace update creativemash
@@ -90,6 +90,8 @@ Media counts as "in use" when a Premiere project, Blender file, After Effects pr
 
 Claude Code session copies (`.claude/worktrees`) are shown separately and can't be removed from the page. Clear old ones in the Claude app.
 
+**See before you choose.** Images and videos have a thumbnail in the list. Click it for a bigger view, or press play to watch a video in the page. A folder of frames shows its first frame. On a Mac, most image types (including PSD, TIFF, HEIC and EXR) and MP4 and MOV videos get thumbnails; on Windows and Linux, PNG, JPG and WebP do. Videos your browser can't play, such as ProRes in Chrome, open in your usual video player instead.
+
 ![Choosing what to keep](screenshots/04-choose-what-to-keep.png)
 
 ## Options
@@ -115,6 +117,7 @@ Saved folders live in `~/.config/cutting-room-floor/config.json` on macOS and Li
 - Cloud-only files (OneDrive "Files On-Demand", iCloud "Optimise Mac Storage") take no room on your disk, so they count as zero and are never opened, which means they are not downloaded by the scan.
 - Some things can't go to the Trash: anything on a network drive, and on Windows anything on a USB stick or too big for the Recycle Bin. The system would delete those for good, so they are marked "Can't go to the Trash" and can't be ticked.
 - The page only answers requests from itself, on your own computer, with a secret key made fresh each time it starts. Other websites and programs can't read your results or remove anything.
+- Thumbnails are made on your computer with its own tools (sips and Quick Look on a Mac) and kept in a temporary folder that's removed when Cutting Room Floor stops. Nothing is uploaded.
 - Symlinks and Windows junctions are skipped, so nothing is counted twice and the scan never wanders off to another drive.
 - On older macOS versions (before macOS 14), removing uses Finder, which may ask once for permission.
 - On Linux, removing needs `gio` (part of most desktops) or `trash-cli`.

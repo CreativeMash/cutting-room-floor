@@ -2,6 +2,13 @@
 
 Each release is listed here, newest first. The Settings page shows the notes for a new version when you check for updates, so keep each entry short and in plain words.
 
+## 1.3.0
+
+- Images and videos have a thumbnail in the list. Click it for a bigger view, so you can see what a file is without opening its folder.
+- Videos play right in the page. If your browser can't play one (ProRes in Chrome, for example), Open in video player opens it in your usual player.
+- A folder of frames shows its first frame.
+- Update now in the update box runs the update for you and shows what it's doing. When it's done, Restart starts the new version and reloads the page.
+
 ## 1.2.4
 
 - The update steps include refreshing the list of versions first, so the Terminal command always installs the newest one.

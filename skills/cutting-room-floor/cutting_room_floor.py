@@ -26,10 +26,12 @@ import re
 import secrets
 import shutil
 import signal
+import socket
 import stat
 import subprocess
 import sys
 import ssl
+import tempfile
 import threading
 import time
 import urllib.error
@@ -38,7 +40,7 @@ import webbrowser
 from collections import defaultdict
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import unquote
+from urllib.parse import parse_qs, unquote
 
 VERSION = "1.0.0"  # fallback only: the real version is read from .claude-plugin/plugin.json
 REPO = "CreativeMash/cutting-room-floor"
@@ -690,6 +692,10 @@ def run_scan(roots, caches):
         data = Scanner(roots, caches).run()
         ITEMS.clear()
         for it in data["items"]:
+            if can_preview(it):
+                it["preview"] = True
+            if video_file(it):
+                it["video"] = True
             ITEMS[it["id"]] = it
         STATE.update(status="ready", data=data, progress="")
     except ScanStopped:  # back to the folder screen
@@ -936,8 +942,302 @@ def check_update() -> dict:
             notes = notes[:3000]
         except Exception:
             pass
-    return dict(current=current, latest=latest, newer=newer, notes=notes, install=install_type(),
+    return dict(current=current, latest=latest, newer=newer, notes=notes, install=install_type(), auto=can_update_here(),
                 repo=REPO_URL, folder=str(PLUGIN_ROOT))
+
+
+# ---- updating and restarting from the page --------------------------------
+# The page's Update now button runs the same commands the update box lists, and
+# shows what they print. Restart starts the new version on the same address.
+PLUGIN_ID = "cutting-room-floor@creativemash"
+UPDATE_JOB = {"state": "idle", "log": "", "version": ""}
+UPDATE_LOCK = threading.Lock()
+
+
+def find_claude():
+    """The claude command, or None. Claude Code's own folders are tried if it isn't on the PATH."""
+    found = shutil.which("claude")
+    if found:
+        return found
+    names = ["claude.exe", "claude.cmd"] if IS_WIN else ["claude"]
+    for folder in (HOME / ".local" / "bin", HOME / ".claude" / "local", Path("/opt/homebrew/bin"), Path("/usr/local/bin")):
+        for n in names:
+            if (folder / n).is_file():
+                return str(folder / n)
+    return None
+
+
+def update_commands():
+    """The commands that update this copy, or None if it has to be done by hand."""
+    kind = install_type()
+    if kind == "claude":
+        exe = find_claude()
+        if exe:
+            return [[exe, "plugin", "marketplace", "update", "creativemash"], [exe, "plugin", "update", PLUGIN_ID]]
+    elif kind == "git" and shutil.which("git"):
+        return [["git", "-C", str(PLUGIN_ROOT), "pull", "--ff-only"]]
+    return None
+
+
+def can_update_here() -> bool:
+    return update_commands() is not None
+
+
+def installed_script() -> Path:
+    """Where the newest installed copy's script is. For a Claude install that is a new
+    folder after each update; otherwise it is this file, updated in place."""
+    if install_type() == "claude":
+        try:
+            recs = json.loads((HOME / ".claude" / "plugins" / "installed_plugins.json").read_text("utf-8"))
+            recs = (recs.get("plugins", recs) or {}).get(PLUGIN_ID) or []
+            best = max(recs, key=lambda r: _vtuple(str(r.get("version", "0"))))
+            script = Path(best["installPath"]) / "skills" / "cutting-room-floor" / Path(__file__).name
+            if script.is_file():
+                return script
+        except (OSError, ValueError, KeyError, TypeError):
+            pass
+    return Path(__file__).resolve()
+
+
+def script_version(script: Path) -> str:
+    try:
+        return json.loads((script.parent.parent.parent / ".claude-plugin" / "plugin.json").read_text("utf-8"))["version"]
+    except (OSError, ValueError, KeyError):
+        return ""
+
+
+def run_update():
+    def log(text):
+        UPDATE_JOB["log"] = (UPDATE_JOB["log"] + text)[-20000:]
+    try:
+        for c in update_commands() or []:
+            log(("\n" if UPDATE_JOB["log"] else "") + "$ " + " ".join(Path(c[0]).name if i == 0 else a for i, a in enumerate(c)) + "\n")
+            proc = subprocess.Popen(c, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
+                                    text=True, encoding="utf-8", errors="replace")
+            try:
+                for line in proc.stdout:
+                    log(line)
+                proc.wait(timeout=300)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+                raise RuntimeError("It took too long and was stopped.")
+            if proc.returncode:
+                raise RuntimeError(f"It stopped with an error (code {proc.returncode}).")
+        UPDATE_JOB.update(state="done", version=script_version(installed_script()))
+    except Exception as e:
+        log(f"\n{e}\n")
+        UPDATE_JOB["state"] = "failed"
+
+
+def start_update() -> bool:
+    with UPDATE_LOCK:
+        if UPDATE_JOB["state"] == "running" or not can_update_here():
+            return False
+        UPDATE_JOB.update(state="running", log="", version="")
+    threading.Thread(target=run_update, daemon=True).start()
+    return True
+
+
+def restart(server):
+    """Start the newest installed copy on this address, then stop this one."""
+    port = server.server_address[1]
+    args = [sys.executable, str(installed_script()), "--port", str(port), "--no-browser", "--take-over"]
+    if STATE["status"] in ("ready", "scanning") and server.roots:  # had results: scan the same folders again
+        args += ["--roots", *[str(r) for r in server.roots]]
+        if not server.caches:
+            args.append("--no-caches")
+    kw = dict(stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, close_fds=True)
+    if IS_WIN:
+        kw["creationflags"] = 0x00000008 | 0x00000200  # on its own, not tied to this process
+    else:
+        kw["start_new_session"] = True
+    time.sleep(0.3)  # let the page get its answer first
+    subprocess.Popen(args, **kw)
+    server.shutdown()
+
+
+def wait_for_port(port: int, limit=20.0):
+    """For --take-over: wait until the copy being replaced has let go of the port."""
+    end = time.time() + limit
+    while time.time() < end:
+        try:
+            socket.create_connection(("127.0.0.1", port), timeout=0.3).close()
+        except OSError:
+            return
+        time.sleep(0.2)
+
+
+# ---- previews --------------------------------------------------------------
+# The page asks for a picture of an item by its id from the scan, never by a path,
+# so it can only ever see image and video files the scan itself listed.
+WEB_IMAGE = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp"}
+PREVIEW_PX = {"s": 160, "l": 1600}
+PREVIEW_DIRECT_MAX = 12 * 1024 * 1024  # bigger web images are shrunk first (on a Mac) or not shown
+PREVIEW_JOBS = threading.Semaphore(3)  # at most this many pictures made at once
+# On a Mac, sips reads these pictures and Quick Look makes stills from these videos.
+# Quick Look waits forever on files it can't read, so it's only given types it can.
+MAC_STILLS = IMAGE - {".dpx"}
+MAC_VIDEO = {".mp4", ".mov", ".m4v"}
+PREVIEW_DIR = None
+PREVIEW_LOCK = threading.Lock()
+PREVIEW_FAILED = set()  # pictures that couldn't be made, so they aren't tried again
+
+
+def can_preview(it) -> bool:
+    """Whether the page should ask for a picture of this item."""
+    if it.get("is_dir") and it.get("kind") != "media":
+        return False
+    src = preview_file(it)
+    if not src:
+        return False
+    ext = src.suffix.lower()
+    if IS_MAC:
+        return ext in MAC_STILLS | MAC_VIDEO
+    try:
+        return ext in WEB_IMAGE and src.stat().st_size <= PREVIEW_DIRECT_MAX
+    except OSError:
+        return False
+
+
+def preview_file(it):
+    """The real file to picture for an item, or None. Links are never followed."""
+    p = Path(it["path"])
+    try:
+        if it.get("is_dir"):
+            if p.is_symlink() or not p.is_dir():
+                return None
+            frames = sorted(e.name for e in os.scandir(p)
+                            if e.is_file(follow_symlinks=False) and Path(e.name).suffix.lower() in IMAGE)
+            if not frames:
+                return None
+            p = p / frames[0]
+        st = os.lstat(p)
+    except OSError:
+        return None
+    if not stat.S_ISREG(st.st_mode) or p.suffix.lower() not in IMAGE | VIDEO:
+        return None
+    return p
+
+
+def preview_cache() -> Path:
+    global PREVIEW_DIR
+    with PREVIEW_LOCK:
+        if PREVIEW_DIR is None:
+            PREVIEW_DIR = Path(tempfile.mkdtemp(prefix="crf-previews-"))
+        return PREVIEW_DIR
+
+
+def make_preview(src: Path, px: int):
+    """A JPEG or PNG no bigger than px on its longest side, made with the Mac's own tools."""
+    st = src.stat()
+    key = hashlib.sha1(f"{src}|{st.st_size}|{st.st_mtime_ns}|{px}".encode()).hexdigest()
+    cache = preview_cache()
+    if key in PREVIEW_FAILED:
+        return None
+    for ext, ctype in ((".jpg", "image/jpeg"), (".png", "image/png")):
+        done = cache / (key + ext)
+        if done.exists():
+            return done.read_bytes(), ctype
+    with PREVIEW_JOBS:
+        work = Path(tempfile.mkdtemp(dir=cache))
+        try:
+            ext = src.suffix.lower()
+            if ext in MAC_STILLS:
+                out = work / "p.jpg"
+                subprocess.run(["sips", "-s", "format", "jpeg", "-s", "formatOptions", "80", "-Z", str(px),
+                                str(src), "--out", str(out)], capture_output=True, timeout=20)
+                if out.exists() and out.stat().st_size:
+                    out.replace(cache / (key + ".jpg"))
+                    return (cache / (key + ".jpg")).read_bytes(), "image/jpeg"
+            elif ext in MAC_VIDEO:
+                subprocess.run(["qlmanage", "-t", "-s", str(px), "-o", str(work), str(src)],
+                               capture_output=True, timeout=10)
+                made = next(work.glob("*.png"), None)
+                if made and made.stat().st_size:
+                    made.replace(cache / (key + ".png"))
+                    return (cache / (key + ".png")).read_bytes(), "image/png"
+        except (OSError, subprocess.SubprocessError):
+            pass
+        finally:
+            shutil.rmtree(work, ignore_errors=True)
+    PREVIEW_FAILED.add(key)
+    return None
+
+
+def preview(it, size: str):
+    """(bytes, content type) for an item's picture, or None if there isn't one."""
+    src = preview_file(it)
+    if not src:
+        return None
+    px = PREVIEW_PX.get(size, PREVIEW_PX["s"])
+    ext = src.suffix.lower()
+    small_web = ext in WEB_IMAGE and src.stat().st_size <= PREVIEW_DIRECT_MAX
+    if IS_MAC and not (small_web and size == "l"):
+        made = make_preview(src, px)
+        if made:
+            return made
+    if small_web:
+        return src.read_bytes(), WEB_IMAGE[ext]
+    return None
+
+
+def clear_previews():
+    if PREVIEW_DIR:
+        shutil.rmtree(PREVIEW_DIR, ignore_errors=True)
+
+
+# ---- playing videos ---------------------------------------------------------
+# A <video> can't send the page's token, so pressing play first asks (with the token)
+# for a pass. The pass names one video from the scan, works only on this server,
+# and lapses after a few minutes without use.
+VIDEO_TYPES = {".mp4": "video/mp4", ".m4v": "video/mp4", ".mov": "video/mp4", ".webm": "video/webm",
+               ".mkv": "video/x-matroska", ".avi": "video/x-msvideo", ".mxf": "application/mxf",
+               ".prores": "video/quicktime"}  # .mov is sent as mp4 so Chrome tries it too; the formats are close cousins
+PASS_LIFE = 10 * 60
+PASSES = {}  # pass -> [item id, expiry]
+PASS_LOCK = threading.Lock()
+
+
+def video_file(it):
+    """The video file for an item, or None. Links and folders are never followed."""
+    if not it or it.get("is_dir"):
+        return None
+    p = Path(it["path"])
+    try:
+        st = os.lstat(p)
+    except OSError:
+        return None
+    return p if stat.S_ISREG(st.st_mode) and p.suffix.lower() in VIDEO else None
+
+
+def new_pass(iid: str) -> str:
+    now = time.time()
+    with PASS_LOCK:
+        for k in [k for k, v in PASSES.items() if v[1] < now]:
+            del PASSES[k]
+        key = secrets.token_urlsafe(24)
+        PASSES[key] = [iid, now + PASS_LIFE]
+        return key
+
+
+def use_pass(key: str):
+    """The item a pass is for, or None. Each use keeps it alive a little longer."""
+    now = time.time()
+    with PASS_LOCK:
+        got = PASSES.get(key or "")
+        if not got or got[1] < now:
+            return None
+        got[1] = now + PASS_LIFE
+        return ITEMS.get(got[0])
+
+
+def open_in_player(path: str):
+    if IS_WIN:
+        os.startfile(os.path.normpath(path))  # the file's own player
+    elif IS_MAC:
+        subprocess.Popen(["open", path])
+    else:
+        subprocess.Popen(["xdg-open", path])
 
 
 # ---- the local web page ----------------------------------------------------
@@ -947,7 +1247,7 @@ def csp(nonce: str) -> str:
             f"script-src 'nonce-{nonce}'; "
             "style-src 'unsafe-inline' https://fonts.googleapis.com; "
             "font-src https://fonts.gstatic.com; "
-            "img-src 'self' data:; connect-src 'self'; "
+            "img-src 'self' data: blob:; media-src 'self'; connect-src 'self'; "
             "base-uri 'none'; form-action 'none'; frame-ancestors 'none'")
 
 
@@ -968,6 +1268,52 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Security-Policy", policy or "default-src 'none'; frame-ancestors 'none'")
         self.end_headers()
         self.wfile.write(data)
+
+    def stream(self, src: Path, ctype: str):
+        """Send a file, or the part the player asks for, so long videos can start and skip at once."""
+        try:
+            f = open(src, "rb")
+        except OSError:
+            return self.send(404, "{}")
+        with f:
+            size = os.fstat(f.fileno()).st_size
+            start, end, code = 0, size - 1, 200
+            m = re.fullmatch(r"bytes=(\d*)-(\d*)", (self.headers.get("Range") or "").strip())
+            if m and (m[1] or m[2]):
+                if m[1]:
+                    start, end = int(m[1]), min(int(m[2]) if m[2] else size - 1, size - 1)
+                else:
+                    start = max(0, size - int(m[2]))
+                if start > end:
+                    self.send_response(416)
+                    self.send_header("Content-Range", f"bytes */{size}")
+                    self.send_header("Content-Length", "0")
+                    self.end_headers()
+                    return
+                code = 206
+            self.send_response(code)
+            self.send_header("Content-Type", ctype)
+            self.send_header("Content-Length", str(end - start + 1))
+            self.send_header("Accept-Ranges", "bytes")
+            if code == 206:
+                self.send_header("Content-Range", f"bytes {start}-{end}/{size}")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("X-Content-Type-Options", "nosniff")
+            self.send_header("Referrer-Policy", "no-referrer")
+            self.send_header("Cross-Origin-Resource-Policy", "same-origin")
+            self.send_header("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'")
+            self.end_headers()
+            f.seek(start)
+            left = end - start + 1
+            try:
+                while left > 0:
+                    chunk = f.read(min(left, 256 * 1024))
+                    if not chunk:
+                        break
+                    self.wfile.write(chunk)
+                    left -= len(chunk)
+            except (BrokenPipeError, ConnectionResetError):
+                pass  # the player skipped ahead or the preview was closed
 
     def trusted(self, need_token=True) -> bool:
         """Turn away anything that isn't this page on this computer.
@@ -996,6 +1342,15 @@ class Handler(BaseHTTPRequestHandler):
             html = Path(__file__).with_name("cutting_room_floor.html").read_text("utf-8")
             html = html.replace("__TOKEN__", TOKEN).replace("__NONCE__", nonce)
             return self.send(200, html, "text/html; charset=utf-8", policy=csp(nonce))
+        if path == "/video":  # the pass stands in for the token, which a <video> can't send
+            if not self.trusted(need_token=False):
+                return
+            if (self.headers.get("Sec-Fetch-Site") or "same-origin") not in ("same-origin", "none"):
+                return self.send(403, json.dumps({"error": "wrong site"}))
+            src = video_file(use_pass(parse_qs(self.path.partition("?")[2]).get("pass", [""])[0]))
+            if not src:
+                return self.send(404, "{}")
+            return self.stream(src, VIDEO_TYPES.get(src.suffix.lower(), "application/octet-stream"))
         if not self.trusted():
             return
         if path == "/state":
@@ -1003,11 +1358,20 @@ class Handler(BaseHTTPRequestHandler):
             out.update(os=OS_INFO, home=str(HOME), sep=os.sep, version=app_version(), install=install_type(), can_pick=can_pick(), roots=[str(r) for r in self.server.roots],
                        check_updates=bool(load_config().get("check_updates", False)))
             return self.send(200, json.dumps(out))
+        if path == "/update-status":
+            return self.send(200, json.dumps(UPDATE_JOB))
         if path == "/suggest":
             cur = [str(r) for r in self.server.roots]
             hidden = load_config().get("hidden", [])
             return self.send(200, json.dumps(dict(suggestions=suggest_folders(cur, hidden), caches=self.server.caches,
                                                   first_run=not cur)))
+        if path == "/preview":
+            q = parse_qs(self.path.partition("?")[2])
+            it = ITEMS.get((q.get("id") or [""])[0])
+            got = preview(it, (q.get("size") or ["s"])[0]) if it and it.get("preview") else None
+            if not got:
+                return self.send(404, "{}")
+            return self.send(200, got[0], got[1])
         self.send(404, "{}")
 
     def do_POST(self):
@@ -1034,6 +1398,17 @@ class Handler(BaseHTTPRequestHandler):
             if STATE["status"] != "scanning":
                 threading.Thread(target=run_scan, args=(roots, caches), daemon=True).start()
             return self.send(200, json.dumps({"ok": True, "problems": problems}))
+        if path == "/video-pass":
+            it = ITEMS.get(body.get("id"))
+            if not video_file(it):
+                return self.send(404, "{}")
+            return self.send(200, json.dumps({"pass": new_pass(it["id"])}))
+        if path == "/open-video":
+            it = ITEMS.get(body.get("id"))
+            src = video_file(it)
+            if src:
+                open_in_player(str(src))
+            return self.send(200, json.dumps({"ok": bool(src)}))
         if path == "/reveal":
             it = ITEMS.get(body.get("id"))
             if it and os.path.lexists(it["path"]):
@@ -1059,6 +1434,11 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(200, json.dumps(pick_folder()))
         if path == "/check-update":
             return self.send(200, json.dumps(check_update()))
+        if path == "/update-now":
+            return self.send(200, json.dumps({"started": start_update()}))
+        if path == "/restart":
+            threading.Thread(target=restart, args=(self.server,), daemon=True).start()
+            return self.send(200, json.dumps({"ok": True}))
         if path == "/prefs":
             if "check_updates" in body:
                 save_config(dict(load_config(), check_updates=bool(body["check_updates"])))
@@ -1130,6 +1510,7 @@ def main():
     ap.add_argument("--no-browser", action="store_true", help="Do not open the page automatically")
     ap.add_argument("--results", action="store_true", help="Print the running scan's findings as JSON, then exit")
     ap.add_argument("--check-update", action="store_true", help="Ask GitHub whether a newer version exists, print JSON, then exit")
+    ap.add_argument("--take-over", action="store_true", help=argparse.SUPPRESS)  # used by Restart in the page
     ap.add_argument("--version", action="version", version=f"Cutting Room Floor {app_version()}")
     a = ap.parse_args()
     cfg = load_config()
@@ -1165,7 +1546,16 @@ def main():
         roots, _ = clean_roots(cfg.get("roots", []))
 
     srv = None
-    for port in range(a.port, a.port + 20):
+    if a.take_over:  # Restart: wait for the old copy to let go, then use the same address
+        wait_for_port(a.port)
+        for _ in range(25):
+            try:
+                srv = ThreadingHTTPServer(("127.0.0.1", a.port), Handler)
+                port = a.port
+                break
+            except OSError:
+                time.sleep(0.2)
+    for port in ([] if srv else range(a.port, a.port + 20)):
         try:
             srv = ThreadingHTTPServer(("127.0.0.1", port), Handler)
             break
@@ -1195,7 +1585,9 @@ def main():
     except KeyboardInterrupt:
         pass
     finally:
+        srv.server_close()
         clear_session(url)
+        clear_previews()
 
 
 if __name__ == "__main__":

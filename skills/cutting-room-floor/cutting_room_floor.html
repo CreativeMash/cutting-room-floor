@@ -120,6 +120,26 @@
   td.sz { width: 140px; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; font-size: 18px; font-weight: 500; letter-spacing: -.02em; }
   .mini { height: 4px; border-radius: 999px; background: var(--ink); margin-top: 10px; margin-left: auto; }
   td.act { width: 170px; text-align: right; }
+  .itm { display: flex; gap: 18px; align-items: flex-start; } .itm > div { flex: 1; min-width: 0; }
+  .th { flex: none; position: relative; width: 72px; height: 72px; margin-top: 2px; padding: 0; border: 0; border-radius: 14px; overflow: hidden; background: var(--bg); color: var(--muted); display: grid; place-items: center; cursor: zoom-in; }
+  .th svg { width: 22px; height: 22px; } .th img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .25s ease; }
+  .th:hover img { transform: scale(1.06); } .th:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .th.none { cursor: default; } .th.wait svg { animation: pulse 1.6s ease-in-out infinite; }
+  .th .play { position: absolute; left: 6px; bottom: 6px; width: 22px; height: 22px; border-radius: 50%; background: rgba(20,21,43,.72); color: #fff; display: grid; place-items: center; }
+  .th .play svg { width: 10px; height: 10px; margin-left: 1px; }
+  dialog.pv { max-width: min(1180px, calc(100% - 40px)); width: auto; min-width: min(420px, calc(100% - 40px)); padding: 14px; }
+  .pv .pic { position: relative; display: grid; place-items: center; min-height: 200px; border-radius: 14px; background: var(--bg); overflow: hidden; }
+  .pv .pic.blank { width: min(960px, calc(100vw - 80px)); aspect-ratio: 16 / 9; background: #14152b; }
+  .pv video { display: block; max-width: 100%; max-height: calc(100vh - 210px); background: #000; }
+  .bigplay { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 84px; height: 84px; border: 0; border-radius: 50%; background: rgba(20,21,43,.72); color: #fff; display: grid; place-items: center; cursor: pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transition: transform .15s ease, background .15s ease; }
+  .bigplay:hover { transform: translate(-50%, -50%) scale(1.06); background: rgba(20,21,43,.86); } .bigplay:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+  .bigplay svg { width: 30px; height: 30px; margin-left: 5px; }
+  .pvmsg { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); display: flex; align-items: center; gap: 14px; padding: 10px 10px 10px 18px; border-radius: 999px; background: var(--paper); box-shadow: 0 6px 20px rgba(0,0,0,.25); font-size: 14px; white-space: nowrap; }
+  .pvmsg p { margin: 0; color: var(--ink); }
+  .pv img { display: block; max-width: 100%; max-height: calc(100vh - 210px); transition: filter .2s ease; }
+  .pv img.soft { width: min(760px, calc(100vw - 80px)); filter: blur(12px); }
+  .pv .cap { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 16px 8px 4px; }
+  .pv .cap .row { margin: 0; flex: none; } .pv .cap .nm { font-size: 18px; }
 
   /* footer */
   footer.foot { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: rgba(250,249,245,.92); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 -1px 0 var(--rule); }
@@ -180,6 +200,13 @@
   .upd p { margin: 10px 0 0; color: var(--muted); }
   .upd .notes { margin: 14px 0 0; padding: 14px 18px; border-radius: 14px; background: var(--paper); white-space: pre-wrap; font: 400 13.5px/1.6 var(--sans); color: var(--ink); }
   .upd ol { margin: 14px 0 0; padding-left: 22px; } .upd li { margin: 8px 0; } .upd li::marker { color: var(--muted); }
+  .updrun { margin-top: 18px; } .updrun .row { justify-content: flex-start; margin-top: 14px; }
+  .runline { display: flex; align-items: center; gap: 10px; margin: 0 !important; color: var(--ink) !important; font-weight: 500; }
+  .runline .dot.go { animation: pulse 1.4s ease-in-out infinite; }
+  .log { max-height: 240px; overflow: auto; margin: 12px 0 0; padding: 14px 16px; border-radius: 14px; background: #14152b; color: #e4e3f0; font: 400 12.5px/1.65 var(--mono); white-space: pre-wrap; word-break: break-word; }
+  .log:empty { display: none; }
+  .upd details { margin-top: 16px; } .upd summary { cursor: pointer; color: var(--muted); font-size: 14px; width: fit-content; }
+  .upd summary:hover { color: var(--ink); }
   .cmd { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
   .cmd code { flex: 1; min-width: 0; overflow-x: auto; white-space: pre; line-height: 1.7; padding: 10px 14px; border-radius: 12px; background: var(--paper); font: 400 13px var(--mono); }
   .updbar { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin: 0 0 18px; padding: 10px 10px 10px 18px; border-radius: 999px; background: var(--bg); font-weight: 500; width: fit-content; }
@@ -209,6 +236,7 @@
     .cards, .cards.two { grid-template-columns: 1fr; } .bold { min-height: 220px; }
     .facts { grid-template-columns: 1fr 1fr; } .facts div:nth-child(3) { padding-left: 0; border-left: 0; }
     .proj { grid-template-columns: 110px 1fr 64px; gap: 12px; } td.act { display: none; } .chart { padding: 8px 18px; }
+    .th { width: 52px; height: 52px; border-radius: 10px; } .itm { gap: 12px; } .pv .cap { flex-direction: column; align-items: flex-start; }
     footer .pill.hide-sm { display: none; }
   }
 </style>
@@ -245,6 +273,13 @@
   <ul id="dlgList"></ul>
   <div class="row"><button class="pill ghost" id="dlgCancel">Cancel</button><button class="pill solid" id="dlgOk">Move to Trash</button></div>
 </dialog>
+<dialog id="pv" class="pv" aria-labelledby="pvName">
+  <div class="pic"><img id="pvImg" alt=""><video id="pvVid" controls playsinline preload="none" hidden></video>
+    <button class="bigplay" id="pvPlay" aria-label="Play video" hidden><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 1v8l7-4z" fill="currentColor"/></svg></button>
+    <div class="pvmsg" id="pvMsg" role="status" hidden><p>This video’s format can’t play here.</p><button class="pill solid sm" id="pvMsgOpen">Open in video player</button></div></div>
+  <div class="cap"><div><div class="nm" id="pvName"></div><div class="pth" id="pvMeta"></div></div>
+    <div class="row"><button class="pill ring sm" id="pvOpen" hidden>Open in video player</button><button class="pill ring sm" id="pvRev"></button><button class="pill solid sm" id="pvClose">Close</button></div></div>
+</dialog>
 <div class="toast" id="toast" role="status"></div>
 
 <script nonce="__NONCE__">
@@ -263,6 +298,90 @@ const SEG = [
 ];
 const RISK = { safe: ["Safe to remove", "--g-green"], review: ["Worth a look", "--g-yellow"], keep: ["Probably keep", "--g-blue"] };
 const ICON_OUT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>';
+const ICON_PIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="m21 16-5-5-9 9"/></svg>';
+const ICON_PLAY = '<span class="play"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 1v8l7-4z" fill="currentColor"/></svg></span>';
+const ICON_FILM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="m10 9 5 3-5 3z"/></svg>';
+const IS_VIDEO = /\.(mp4|mov|mxf|avi|mkv|m4v|webm|prores)$/i;
+
+// Pictures come from the server by item id, with the token, and are shown as blob: URLs.
+let PICS = new Map(), PICS_FOR = null;
+function pic(id, size) {
+  if (PICS_FOR !== D) { PICS.forEach(p => p.then(u => u && URL.revokeObjectURL(u))); PICS = new Map(); PICS_FOR = D; }
+  const k = id + "|" + size;
+  if (!PICS.has(k)) PICS.set(k, fetch(`/preview?id=${encodeURIComponent(id)}&size=${size}`, { headers: { "X-Token": TOKEN } })
+    .then(r => r.ok ? r.blob() : null).then(b => b && b.size ? URL.createObjectURL(b) : null).catch(() => null));
+  return PICS.get(k);
+}
+const thumbs = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  thumbs.unobserve(e.target);
+  loadThumb(e.target);
+}), { rootMargin: "400px 0px" });
+async function loadThumb(b) {
+  b.classList.add("wait");
+  const url = await pic(b.dataset.pv, "s");
+  b.classList.remove("wait");
+  if (!b.isConnected) return;
+  if (url) { b.innerHTML = `<img src="${url}" alt="">${IS_VIDEO.test(b.dataset.name) ? ICON_PLAY : ""}`; return; }
+  b.classList.add("none"); b.disabled = true; b.setAttribute("aria-label", "No preview for this file");
+}
+function resetPlayer() {
+  const v = $("#pvVid");
+  v.onerror = v.onloadedmetadata = null;
+  v.pause(); v.removeAttribute("src"); v.removeAttribute("poster"); v.load();
+  v.hidden = true; $("#pvMsg").hidden = true; $("#pvPlay").hidden = true;
+}
+async function playVideo(id) {
+  const v = $("#pvVid"), img = $("#pvImg");
+  $("#pvPlay").hidden = true;
+  let r = null;
+  try { r = await post("/video-pass", { id }); } catch (e) {}
+  if ($("#pv").dataset.id !== id) return;
+  if (!r || !r.pass) return cantPlay(id);
+  v.style.width = img.hidden ? "100%" : img.clientWidth + "px";
+  if (!img.hidden && img.src) v.poster = img.src;
+  v.onerror = () => cantPlay(id);
+  // Some formats play their sound with no picture: treat that as can't play.
+  v.onloadedmetadata = () => { if (!v.videoWidth) cantPlay(id); };
+  v.src = "/video?pass=" + encodeURIComponent(r.pass);
+  img.hidden = true; v.hidden = false;
+  v.play().catch(() => {});
+  v.focus();
+}
+function cantPlay(id) {
+  if ($("#pv").dataset.id !== id) return;
+  const img = $("#pvImg");
+  resetPlayer();
+  img.hidden = !img.getAttribute("src");
+  $("#pvMsg").hidden = false;
+}
+async function openPreview(id) {
+  const it = D && D.items.find(i => i.id === id);
+  if (!it) return;
+  const dlg = $("#pv"), img = $("#pvImg");
+  dlg.dataset.id = id;
+  $("#pvName").textContent = it.name;
+  $("#pvMeta").textContent = [fmt(it.size), it.is_dir ? `first of ${it.count} frames` : it.video ? (it.preview ? "a still from the video" : "video") : "", tilde(it.path)].filter(Boolean).join(" · ");
+  $("#pvRev").innerHTML = `${esc(OS.reveal)} ${ICON_OUT}`;
+  $("#pvRev").onclick = () => post("/reveal", { id });
+  img.alt = `Preview of ${it.name}`;
+  resetPlayer();
+  img.removeAttribute("src"); img.classList.add("soft");
+  $("#pvOpen").hidden = !it.video;
+  $("#pvOpen").onclick = $("#pvMsgOpen").onclick = () => post("/open-video", { id });
+  $("#pvPlay").onclick = () => playVideo(id);
+  const small = it.preview ? await pic(id, "s") : null;
+  if (dlg.dataset.id !== id) return;  // another preview was opened meanwhile
+  if (small) img.src = small;
+  img.hidden = !small;
+  $(".pv .pic").classList.toggle("blank", !small);
+  $("#pvPlay").hidden = !it.video;
+  if (!dlg.open) dlg.showModal();
+  if (it.video) $("#pvPlay").focus();
+  if (!it.preview) return;
+  const big = await pic(id, "l");
+  if (dlg.open && dlg.dataset.id === id && big) { img.src = big; img.classList.remove("soft"); }
+}
 let D = null, view = { kind: "all", project: null, q: "" };
 let OS = { computer: "computer", reveal: "Show in folder", bin: "Trash" }, HOME_DIR = "", SEP = "/";
 let APP = { version: "", install: "zip", can_pick: false, check_updates: false }, UPD = null, autoChecked = false;
@@ -465,7 +584,57 @@ function shuffle(box) {
 }
 $("#app").addEventListener("click", e => { const box = e.target.closest(".orns"); if (box) shuffle(box); });
 
-// ---- updates: never installed from here, only explained ----
+// ---- updates: Update now runs the listed commands on this computer; Restart starts the new version ----
+let JOB = { state: "idle", log: "" };
+function runBox(s) {
+  const log = `<pre class="log" id="updLog">${esc(s.log || "")}</pre>`;
+  if (s.state === "running") return `<p class="runline">${dot("--g-sky").replace('class="dot"', 'class="dot go"')}Updating. This can take a minute…</p>${log}`;
+  if (s.state === "done") return `<p class="runline">${dot("--g-green")}Version ${esc(s.version || (UPD && UPD.latest) || "")} is installed. Restart to start using it.</p>${log}
+    <div class="row"><button class="pill solid" id="updRestart">Restart Cutting Room Floor</button></div>`;
+  if (s.state === "restarting") return `<p class="runline">${dot("--g-sky").replace('class="dot"', 'class="dot go"')}Restarting. The page will reload by itself…</p>`;
+  if (s.state === "lost") return `<p class="runline">${dot("--g-yellow")}It didn’t come back by itself.</p><p>Ask Claude to run Cutting Room Floor again. The update is installed.</p>`;
+  if (s.state === "failed") return `<p class="runline">${dot("--g-yellow")}The update didn’t finish. What it printed is below.</p>${log}
+    <div class="row"><button class="pill solid" id="updNow">Try again</button></div>`;
+  return `<button class="pill solid" id="updNow">Update now</button>`;
+}
+function showJob(s) {
+  JOB = s;
+  const box = $("#updRun");
+  if (!box) return;
+  box.innerHTML = runBox(s);
+  const lg = $("#updLog"); if (lg) lg.scrollTop = lg.scrollHeight;
+  if (s.state === "failed") { const d = $("#updManual"); if (d) d.open = true; }
+  wireUpd();
+}
+let POLLING = false;
+async function pollJob(again) {
+  if (POLLING && !again) return;
+  POLLING = true;
+  let s = null;
+  try { s = await (await fetch("/update-status", { headers: { "X-Token": TOKEN } })).json(); } catch (e) {}
+  if (!s) return setTimeout(() => pollJob(true), 1500);
+  showJob(s);
+  if (s.state === "running") setTimeout(() => pollJob(true), 700);
+  else POLLING = false;
+}
+async function restartApp() {
+  showJob({ state: "restarting" });
+  try { await post("/restart"); } catch (e) {}
+  const end = Date.now() + 45000;
+  while (Date.now() < end) {
+    await new Promise(r => setTimeout(r, 600));
+    try {
+      const r = await fetch("/state", { headers: { "X-Token": TOKEN }, cache: "no-store" });
+      if (r.status === 403) { location.reload(); return; }  // the new copy has its own key
+    } catch (e) {}  // between the two copies
+  }
+  showJob({ state: "lost" });
+}
+function wireUpd() {
+  const go = $("#updNow"), rs = $("#updRestart");
+  if (go) go.onclick = async () => { showJob({ state: "running", log: "" }); try { await post("/update-now"); } catch (e) {} pollJob(); };
+  if (rs) rs.onclick = restartApp;
+}
 const cmd = (...cs) => `<div class="cmd"><code>${cs.map(esc).join("\n")}</code><button class="pill ghost sm" data-copy="${esc(cs.join("; "))}">Copy</button></div>`;
 function updBox(u) {
   if (u.error) return `<div class="upd"><h3>${dot("--g-yellow")}Couldn’t check for updates</h3><p>${esc(u.error)}</p></div>`;
@@ -481,11 +650,13 @@ function updBox(u) {
   return `<div class="upd"><h3>${dot("--g-pink")}Version ${esc(u.latest)} is available</h3>
     <p>You have ${esc(u.current)}. Nothing changes until you update.</p>
     ${u.notes ? `<div class="notes">${esc(u.notes.replace(/^\s*[-*] /gm, "• ")).replace(/^## *(.+)$/gm, "<b>Version $1</b>")}</div>` : ""}
-    <ol>${steps}</ol>
+    ${u.auto ? `<div class="updrun" id="updRun">${runBox(JOB)}</div><details id="updManual"><summary>Or update it yourself</summary><ol>${steps}</ol></details>` : `<ol>${steps}</ol>`}
     ${u.install === "claude" ? `<p>To get updates without asking, type <code>/plugin</code> in Claude Code in a terminal, open <b>Marketplaces</b>, pick <b>creativemash</b> and turn on auto-update.</p>` : ""}
   </div>`;
 }
 function wireCopy() {
+  wireUpd();
+  if (JOB.state === "running" && $("#updRun")) pollJob();
   document.querySelectorAll("[data-copy]").forEach(b => b.onclick = async () => {
     try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = "Copied"; } catch (e) { b.textContent = "Select and copy"; }
     setTimeout(() => b.textContent = "Copy", 1600);
@@ -598,10 +769,11 @@ function row(i, maxS) {
   const g = gone.has(i.id);
   const [label, col] = RISK[i.risk];
   const nb = i.no_bin && !g;
+  const pv = (i.preview || i.video) && !g;
   return `<tr class="${g ? "gone" : ""}">
     <td class="ck"><input type="checkbox" aria-label="Select ${esc(i.name)}" data-id="${i.id}" ${sel.has(i.id) ? "checked" : ""} ${g || nb ? "disabled" : ""}></td>
-    <td><div class="nm">${esc(i.name)}${i.count ? `<span class="cnt">${i.count} files</span>` : ""}<span class="tag">${dot(col)}${label}</span>${nb ? `<span class="tag">${dot("--g-orange")}Can’t go to the ${esc(OS.bin)}</span>` : ""}</div>
-      <div class="pth">${esc(tilde(i.path))}</div><div class="note">${esc(i.note)}</div>${nb ? `<div class="note"><b>${esc(i.no_bin)}</b></div>` : ""}</td>
+    <td>${pv ? `<div class="itm"><button class="th" data-pv="${i.id}" data-name="${esc(i.name)}" ${i.preview ? "data-pic" : ""} aria-label="${i.preview ? "Preview" : "Play"} ${esc(i.name)}">${i.preview ? ICON_PIC : ICON_FILM}</button><div>` : ""}<div class="nm">${esc(i.name)}${i.count ? `<span class="cnt">${i.count} files</span>` : ""}<span class="tag">${dot(col)}${label}</span>${nb ? `<span class="tag">${dot("--g-orange")}Can’t go to the ${esc(OS.bin)}</span>` : ""}</div>
+      <div class="pth">${esc(tilde(i.path))}</div><div class="note">${esc(i.note)}</div>${nb ? `<div class="note"><b>${esc(i.no_bin)}</b></div>` : ""}${pv ? "</div></div>" : ""}</td>
     <td class="sz">${fmt(i.size)}<div class="mini" style="width:${Math.max(4, i.size / maxS * 100)}%"></div></td>
     <td class="act">${g ? `<span class="eyebrow">In the ${esc(OS.bin)}</span>` : `<button class="pill ring sm" data-rev="${i.id}">${esc(OS.reveal)} ${ICON_OUT}</button>`}</td></tr>`;
 }
@@ -622,6 +794,7 @@ function renderList() {
   $("#list").innerHTML = html || `<tr><td class="empty">Nothing here${view.project || view.q ? " with the current filter" : ""}.</td></tr>`;
   $("#list").querySelectorAll("input[type=checkbox]").forEach(cb => cb.onchange = () => { cb.checked ? sel.add(cb.dataset.id) : sel.delete(cb.dataset.id); updateFoot(); });
   $("#list").querySelectorAll("[data-rev]").forEach(b => b.onclick = () => post("/reveal", { id: b.dataset.rev }));
+  $("#list").querySelectorAll("[data-pv]").forEach(b => { b.onclick = () => openPreview(b.dataset.pv); if (b.hasAttribute("data-pic")) thumbs.observe(b); });
   updateFoot();
 }
 
@@ -656,6 +829,12 @@ $("#trashBtn").onclick = () => {
   $("#dlg").showModal();
 };
 $("#dlgCancel").onclick = () => $("#dlg").close();
+$("#pvClose").onclick = () => $("#pv").close();
+$("#pv").addEventListener("close", () => { if (!$("#pv").open) resetPlayer(); });
+$("#pv").onclick = e => {  // a click outside the box closes it
+  const r = $("#pv").getBoundingClientRect();
+  if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) $("#pv").close();
+};
 $("#dlgOk").onclick = async () => {
   const s = selection();
   $("#dlgOk").disabled = true; $("#dlgOk").textContent = "Moving";
