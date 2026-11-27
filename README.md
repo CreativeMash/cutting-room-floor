@@ -94,6 +94,8 @@ Claude Code session copies (`.claude/worktrees`) are shown separately and can't 
 
 **Narrow it down.** The project menu next to the search box lists every project with its size; untick the ones you don't want to see, or click a project in the chart to show only that one. The file type menu groups what was found (documents, images, video, design files, 3D, archives and more), and each group opens to show its file types, such as MOV or PDF. The list shows the biggest 50 items first, with Show more for the rest, and the filters stay at the top as you scroll.
 
+![The file type menu, with Video opened](screenshots/06-file-types.png)
+
 **A shorter list.** In Settings, under The list, you can turn off thumbnails, folder paths and descriptions. Hovering over a name still shows its folder and description.
 
 ![Previewing a video before choosing](screenshots/05-preview.png)
