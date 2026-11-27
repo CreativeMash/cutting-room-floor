@@ -188,6 +188,7 @@
   /* footer */
   footer.foot { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: rgba(250,249,245,.92); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 -1px 0 var(--rule); }
   footer.foot .wrap { display: flex; gap: 8px; align-items: center; height: 80px; }
+  footer .pill[hidden] { display: none; }
   footer .sel { flex: 1; display: flex; align-items: baseline; gap: 12px; }
   footer .sel b { font-size: 28px; font-weight: 500; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
   footer .sel span { font: 400 13px var(--mono); color: var(--muted); }
@@ -302,8 +303,8 @@
 
 <footer class="foot" id="foot" hidden><div class="wrap">
   <div class="sel"><b id="selSize">0 B</b><span><span id="selCount">0</span> selected</span></div>
+  <button class="pill ghost" id="clear" hidden>Clear selection</button>
   <button class="pill ring hide-sm" id="selSafe"><span class="dot" style="background:var(--g-green)"></span>Select all safe</button>
-  <button class="pill ghost" id="clear">Clear selection</button>
   <button class="pill solid" id="trashBtn" disabled>Move to Trash</button>
 </div></footer>
 
@@ -1004,7 +1005,7 @@ function updateFoot() {
   const s = selection();
   $("#selCount").textContent = s.length;
   $("#selSize").textContent = fmt(s.reduce((a, i) => a + i.size, 0));
-  $("#trashBtn").disabled = !s.length;
+  $("#trashBtn").disabled = !s.length; $("#clear").hidden = !s.length;
 }
 function toast(msg) { const t = $("#toast"); t.innerHTML = dot("--g-green") + esc(msg); t.style.display = "inline-flex"; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = "none", 4500); }
 
