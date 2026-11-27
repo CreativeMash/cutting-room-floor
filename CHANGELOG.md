@@ -2,6 +2,11 @@
 
 Each release is listed here, newest first. The Settings page shows the notes for a new version when you check for updates, so keep each entry short and in plain words.
 
+## 1.2.2
+
+- The three summary cards all use white text.
+- On the Settings page, the button at the top right takes you back to your results, so you can switch between the two.
+
 ## 1.2.1
 
 - While it scans, the progress and the Stop button sit in a bar at the bottom, so the page no longer jumps about with long file names.
