@@ -104,6 +104,11 @@ SPLIT_RE = re.compile(r"[/\\\"'<>()=\x00\r\n\t|]")
 WORKTREE_RE = re.compile(r"[\\/]\.claude[\\/]worktrees[\\/]")
 
 STATE = {"status": "starting", "progress": "", "data": None, "error": None}
+STOP = threading.Event()  # set by the page's Stop button
+
+
+class ScanStopped(Exception):
+    pass
 ITEMS = {}  # id -> item (server side copy with absolute path)
 TOKEN = secrets.token_urlsafe(24)
 
@@ -383,6 +388,9 @@ class Scanner:
         return any(n in PROJECT_MARKERS or os.path.splitext(n)[1].lower() in PROJECT_FILE_EXT for n in names)
 
     def progress(self, msg):
+        # Called for every folder and file group, so Stop takes effect within a moment.
+        if STOP.is_set():
+            raise ScanStopped()
         STATE["progress"] = msg
 
     @staticmethod
@@ -673,6 +681,7 @@ class Scanner:
 
 
 def run_scan(roots, caches):
+    STOP.clear()
     STATE.update(status="scanning", data=None, error=None, progress="Starting")
     try:
         data = Scanner(roots, caches).run()
@@ -680,6 +689,8 @@ def run_scan(roots, caches):
         for it in data["items"]:
             ITEMS[it["id"]] = it
         STATE.update(status="ready", data=data, progress="")
+    except ScanStopped:  # back to the folder screen
+        STATE.update(status="setup", data=None, progress="")
     except Exception as e:  # show it in the page
         STATE.update(status="error", error=repr(e))
         raise
@@ -1019,6 +1030,10 @@ class Handler(BaseHTTPRequestHandler):
                 except Exception as e:
                     results.append(dict(id=iid, ok=False, msg=str(e)))
             return self.send(200, json.dumps({"results": results}))
+        if path == "/stop":
+            if STATE["status"] == "scanning":
+                STOP.set()
+            return self.send(200, "{}")
         if path == "/pick-folder":
             return self.send(200, json.dumps(pick_folder()))
         if path == "/check-update":
@@ -1062,20 +1077,30 @@ def clear_session(url: str):
         pass
 
 
-def print_results():
-    try:
-        s = json.loads(session_path().read_text("utf-8"))
-        req = urllib.request.Request(s["url"] + "/state", headers={"X-Token": s["token"]})
-        with urllib.request.urlopen(req, timeout=5) as r:
-            print(r.read().decode("utf-8"))
-    except (OSError, ValueError, KeyError):
-        sys.exit("Cutting Room Floor isn't running. Start it first.")
+def print_results(wait=False):
+    """Print the findings. With wait, first wait (up to an hour) until the person has
+    pressed Start the scan and the scan has finished, or the server has stopped."""
+    deadline = time.time() + 3600
+    while True:
+        try:
+            s = json.loads(session_path().read_text("utf-8"))
+            req = urllib.request.Request(s["url"] + "/state", headers={"X-Token": s["token"]})
+            with urllib.request.urlopen(req, timeout=5) as r:
+                body = r.read().decode("utf-8")
+        except (OSError, ValueError, KeyError):
+            sys.exit("Cutting Room Floor isn't running. Start it first.")
+        if not wait or json.loads(body).get("status") in ("ready", "error") or time.time() > deadline:
+            print(body)
+            return
+        time.sleep(2)
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--roots", nargs="+", metavar="FOLDER", help="Scan these folders this time, without changing your saved folders")
-    ap.add_argument("--setup", action="store_true", help="Choose which folders to look at, in the page")
+    ap.add_argument("--setup", action="store_true", help=argparse.SUPPRESS)  # now the default; kept for old instructions
+    ap.add_argument("--scan-now", action="store_true", help="Scan the saved folders straight away, without the folder screen")
+    ap.add_argument("--wait", action="store_true", help="With --results: wait until the scan has finished first")
     ap.add_argument("--set-roots", nargs="+", metavar="FOLDER", help="Save these as your folders, then exit")
     ap.add_argument("--suggest", action="store_true", help="Print suggested project folders as JSON, then exit")
     ap.add_argument("--show-config", action="store_true", help="Print your saved settings as JSON, then exit")
@@ -1092,7 +1117,7 @@ def main():
         print(json.dumps(check_update(), indent=2))
         return
     if a.results:
-        print_results()
+        print_results(a.wait)
         return
     if a.show_config:
         print(json.dumps(dict(config_file=str(config_path()), roots=cfg.get("roots", []),
@@ -1128,7 +1153,10 @@ def main():
     if not srv:
         sys.exit(f"No free port between {a.port} and {a.port + 19}. Try --port with another number.")
     srv.roots, srv.caches = roots, caches
-    if roots and not a.setup:
+    # Folders named on the command line are scanned straight away. Otherwise the page
+    # opens on the folder screen with the saved folders ticked, and nothing is read
+    # until the person presses Start the scan.
+    if roots and (a.roots or a.scan_now):
         threading.Thread(target=run_scan, args=(roots, caches), daemon=True).start()
     else:
         STATE["status"] = "setup"
@@ -1138,7 +1166,7 @@ def main():
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))  # stopping it from Claude also tidies up
     print(f"Cutting Room Floor is running at {url}  (press Ctrl+C to stop)", flush=True)
     if STATE["status"] == "setup":
-        print("Pick your project folders in the page to start the scan.", flush=True)
+        print("Check the folders in the page, then press Start the scan.", flush=True)
     if not a.no_browser:
         threading.Timer(0.6, lambda: webbrowser.open(url)).start()
     try:

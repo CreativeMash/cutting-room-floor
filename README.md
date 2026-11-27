@@ -30,7 +30,7 @@ claude plugin install cutting-room-floor@creativemash
 
 Type them straight into Terminal, as they are. (Inside a running Claude Code session, after you've typed `claude`, the same thing is `/plugin marketplace add CreativeMash/cutting-room-floor` and `/plugin install cutting-room-floor@creativemash`. Those `/plugin` versions don't work in a plain Terminal or in the desktop app.)
 
-Then start a new session and ask Claude in your own words, for example *"my Mac is running out of space"*, *"what can I delete in my projects?"* or *"what's on my cutting room floor?"*. The first time, Claude suggests folders to scan (the projects you've worked on with Claude, plus usual places like `~/Projects` or `Documents\GitHub`), you tick the ones you want, and it remembers them. Then it opens the page and talks you through what it found.
+Then start a new session and ask Claude in your own words, for example *"my Mac is running out of space"*, *"what can I delete in my projects?"* or *"what's on my cutting room floor?"*. Claude opens the page on the folder screen. The first time, it suggests folders (the projects you've worked on with Claude, plus usual places like `~/Projects` or `Documents\GitHub`); after that, your saved folders are ticked. Check them, press **Start the scan**, and Claude talks you through what it found.
 
 ### Getting updates
 
@@ -60,7 +60,7 @@ python3 skills/cutting-room-floor/cutting_room_floor.py
 py -3 skills\cutting-room-floor\cutting_room_floor.py
 ```
 
-Your browser opens on a folder picker. Tick your project folders, or press **Choose a folder…** to pick one in Finder or Explorer, then press **Start the scan**. The results appear when it's done, and next time it goes straight to the scan.
+Your browser opens on a folder picker. Tick your project folders, or press **Choose a folder…** to pick one in Finder or Explorer, then press **Start the scan**. The results appear when it's done. Next time your folders are already ticked, so you can check them and press Start. There's a **Stop** button while it scans.
 
 To update, download the ZIP again and replace the old folder (if you cloned it with Git, run `git pull` instead). Your saved folders are kept.
 
@@ -94,7 +94,7 @@ Claude Code session copies (`.claude/worktrees`) are shown separately and can't 
 ## Options
 
 ```
---setup              open the page on the folder picker
+--scan-now           scan your saved folders straight away, skipping the folder screen
 --roots FOLDER ...   scan these folders this time, without changing your saved ones
 --no-caches          skip app and download caches
 --no-browser         don't open the browser automatically
@@ -103,7 +103,7 @@ Claude Code session copies (`.claude/worktrees`) are shown separately and can't 
 --set-roots F ...    save folders without opening the page
 --show-config        print your saved settings
 --check-update       ask GitHub whether a newer version exists
---results            print the running scan's findings as JSON
+--results            print the running scan's findings as JSON (add --wait to wait for the scan)
 --version            print the version
 ```
 

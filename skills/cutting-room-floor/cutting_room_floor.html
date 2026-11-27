@@ -131,6 +131,8 @@
 
   .empty { color: var(--muted); padding: 40px 0; text-align: center; }
   .loading { padding: clamp(80px, 14vw, 200px) 0; }
+  .loading.scan { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: clamp(32px, 5vw, 80px); align-items: center; padding: clamp(40px, 7vw, 120px) 0; }
+  .loading.scan .go { margin-top: 28px; }
   .loading code { font: 400 12.5px var(--mono); color: var(--muted); word-break: break-all; }
   dialog { border: 0; border-radius: 24px; background: var(--paper); color: var(--ink); max-width: 560px; width: calc(100% - 40px); padding: 32px; box-shadow: 0 0 0 1px rgba(29,30,27,.1), 0 24px 48px -12px rgba(29,30,27,.28); }
   dialog::backdrop { background: rgba(10,10,10,.28); }
@@ -198,7 +200,7 @@
   .credit a { color: var(--ink); text-underline-offset: 3px; }
   a.home { display: block; color: inherit; }
   @media (max-width: 900px) {
-    .intro.hero { display: block; } .orns { display: none; }
+    .intro.hero, .loading.scan { display: block; } .orns { display: none; }
     .updbar { display: grid; grid-template-columns: auto 1fr; gap: 10px 12px; border-radius: 18px; padding: 14px 16px; width: auto; } .updbar .dot { margin-top: 7px; } .updbar button { grid-column: 2; justify-self: start; }
     .crumb { display: none; } header.top .wrap { gap: 8px; }
     .cards, .cards.two { grid-template-columns: 1fr; } .bold { min-height: 220px; }
@@ -274,9 +276,23 @@ async function post(url, body) {
   const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json", "X-Token": TOKEN }, body: JSON.stringify(body || {}) });
   return r.json();
 }
+let SPIN = null;
 function scanning() {
   $("#foot").hidden = true; $("#rescan").hidden = true; $("#settings").hidden = true;
-  $("#app").innerHTML = `<div class="loading"><h1>Checking the cutting room floor</h1><p id="prog" class="lead"></p></div>`;
+  $("#app").innerHTML = `<div class="loading scan"><div>
+      <h1>Checking the cutting room floor</h1><p id="prog" class="lead"></p>
+      <div class="go"><button class="pill ring" id="stopScan">Stop</button></div>
+    </div>${orns()}</div>`;
+  $("#stopScan").onclick = async () => {
+    $("#stopScan").disabled = true; $("#stopScan").textContent = "Stopping…";
+    await post("/stop");
+  };
+  // The shapes shuffle by themselves while it works, as a sign it's still going.
+  clearInterval(SPIN);
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) SPIN = setInterval(() => {
+    const box = document.querySelector(".loading .orns");
+    if (box) shuffle(box); else clearInterval(SPIN);
+  }, 1500);
 }
 async function poll() {
   const s = await get("/state");
@@ -332,8 +348,10 @@ async function openSetup(settings) {
     </section>
     ${credit()}` : `
     <div class="intro hero"><div>
-      <h1>Which folders should we look at?</h1>
-      <p class="lead">Tick where you keep your projects. Only ticked folders are read, and nothing leaves your ${esc(OS.computer)}.</p>
+      ${r.first_run ? `<h1>Which folders should we look at?</h1>
+      <p class="lead">Tick where you keep your projects. Only ticked folders are read, and nothing leaves your ${esc(OS.computer)}.</p>`
+      : `<h1>Ready to scan these folders?</h1>
+      <p class="lead">Your saved folders are ticked. Change them if you like, then press Start the scan. Nothing leaves your ${esc(OS.computer)}.</p>`}
     </div>${orns()}</div>
     <section class="block">${folders}</section>
     ${credit()}`;

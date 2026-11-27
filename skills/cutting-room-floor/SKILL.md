@@ -20,27 +20,26 @@ Try these in order and use the first one that prints a version of 3.8 or newer:
 
 If none works, tell the person they need Python first (python.org/downloads, and on Windows tick "Add python.exe to PATH" in the installer), then stop.
 
-## 2. First run: ask which folders to look at
+## 2. Start it on the folder screen
 
-Run `PYTHON SCRIPT --show-config`.
+Run `PYTHON SCRIPT` **in the background** (it is a server and keeps running). It prints the address, usually `http://127.0.0.1:8765` (it picks the next free port if that one is taken), and opens the page in their browser.
 
-If `roots` is empty, or the person asked to change folders, do the setup:
+The page always opens on the folder screen first, and nothing is read until the person presses **Start the scan**:
 
-1. Run `PYTHON SCRIPT --suggest`. It prints a JSON list of folders found on their computer: folders they have worked in with Claude Code (`claude: true`, with a note naming the projects), plus usual project places such as `~/Projects`, `~/code`, `~/Documents/GitHub` or `~/source/repos`. Entries with `checked: true` are the best guesses.
-2. Ask the person which folders to scan. Show each folder's `display` path and `note`, best guesses first. If there are four or fewer, ask with a multiple-choice question that allows several answers; otherwise list them numbered and ask them to reply with the numbers. Always let them add other folders. Tell them in one line that Cutting Room Floor only reads inside these folders and nothing leaves their computer.
-3. Save their choice: `PYTHON SCRIPT --set-roots "FOLDER 1" "FOLDER 2" ...`. If it reports a folder as too broad (a whole home folder or drive), ask for the folders inside it where the projects actually live.
+- First time: it suggests folders (the projects they have worked on with Claude, plus usual places like `~/Projects` or `Documents\GitHub`) to tick, with a button that opens their system's own folder window.
+- After that: their saved folders are already ticked, and they can change them before starting.
 
-If there is already a saved list and they did not ask to change it, skip this step and mention which folders it will scan.
+Don't ask about folders in chat; the page does that better. Tell them in a few words that the page is open with their folders ready to check (name the saved ones if `PYTHON SCRIPT --show-config` lists any), that they press **Start the scan** when they're happy, and that you'll summarise when it's done. Give the address in case the browser didn't open. There's a Stop button while it scans, and **Settings** in the header for folders and updates.
 
-## 3. Start it
+If the person names specific folders in their request ("check my ~/Work folder"), start it with `PYTHON SCRIPT --roots "FOLDER" ...` instead. That scans those folders straight away, without changing their saved list.
 
-Run `PYTHON SCRIPT` **in the background** (it is a server and keeps running). It prints the address, usually `http://127.0.0.1:8765` (it picks the next free port if that one is taken), and opens the page in their browser. Give them the address in case the browser did not open.
+## 3. Wait for the scan
 
-The person can also pick folders in the page itself: if no folders are saved, the page opens on a folder picker (with a button that opens their system's own folder window), and the header has a "Settings" button for changing folders and checking for updates.
+Run `PYTHON SCRIPT --results --wait` **in the background**. It waits until they have pressed Start and the scan has finished (up to an hour), then prints the findings as JSON. When it completes, go on to the next step. If they tell you they're done before then, run `PYTHON SCRIPT --results` to read the findings now. A `status` of `setup` means they haven't started a scan yet.
 
 ## 4. Help with the results
 
-The scan takes from a few seconds to a few minutes, depending on how much is in the folders. When it finishes you can read the results yourself with `PYTHON SCRIPT --results`, which asks the running server and prints JSON. (The server only answers its own page and this command, so a plain `curl` to the address is turned away.) `data.items` holds every finding with `path`, `size` in bytes, `kind`, `risk` (`safe`, `review` or `keep`) and `note`.
+The findings come from `PYTHON SCRIPT --results`, which asks the running server and prints JSON. (The server only answers its own page and this command, so a plain `curl` to the address is turned away.) `data.items` holds every finding with `path`, `size` in bytes, `kind`, `risk` (`safe`, `review` or `keep`) and `note`.
 
 Give a short summary in plain words: how much is in "Safe to remove" (build folders, caches and backups that come back by themselves) and the biggest items worth a look. Point out anything that needs care:
 
@@ -75,11 +74,12 @@ The server stops when the person presses Ctrl+C in its window, or when you stop 
 ## Options
 
 - `--roots FOLDER ...` scans other folders this time without changing the saved list.
-- `--setup` opens the page on the folder picker.
+- `--scan-now` scans the saved folders straight away, without the folder screen. Use it only if the person asks to skip the check.
 - `--no-caches` skips app and download caches.
 - `--no-browser` does not open the browser.
 - `--port N` picks the starting port.
 - `--check-update` asks GitHub whether a newer version exists, then exits.
-- `--results` prints the running scan's findings as JSON, then exits.
+- `--results` prints the running scan's findings as JSON, then exits. Add `--wait` to wait for the scan to finish first.
+- `--suggest`, `--set-roots FOLDER ...` and `--show-config` print suggested folders, save folders, or print the saved settings.
 
 Saved settings live in `~/.config/cutting-room-floor/config.json` (macOS and Linux) or `%APPDATA%\Cutting Room Floor\config.json` (Windows).
