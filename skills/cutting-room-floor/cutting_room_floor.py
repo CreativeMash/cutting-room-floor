@@ -43,7 +43,10 @@ from urllib.parse import unquote
 VERSION = "1.0.0"  # fallback only: the real version is read from .claude-plugin/plugin.json
 REPO = "CreativeMash/cutting-room-floor"
 REPO_URL = f"https://github.com/{REPO}"
-UPDATE_BASE = os.environ.get("CRF_UPDATE_BASE") or f"https://raw.githubusercontent.com/{REPO}/main"
+UPDATE_TEST_BASE = os.environ.get("CRF_UPDATE_BASE")  # for testing: read update files from here instead of GitHub
+UPDATE_BASE = UPDATE_TEST_BASE or f"https://raw.githubusercontent.com/{REPO}/main"
+# GitHub's file server keeps an old copy for up to 5 minutes after a release; its API is at most a minute behind.
+UPDATE_API = f"https://api.github.com/repos/{REPO}/contents"
 PLUGIN_ROOT = Path(__file__).resolve().parent.parent.parent
 IS_WIN = os.name == "nt"
 IS_MAC = sys.platform == "darwin"
@@ -891,10 +894,20 @@ def check_update() -> dict:
     current = app_version()
     headers = {"User-Agent": f"cutting-room-floor/{current}"}
 
-    def fetch(path):
-        req = urllib.request.Request(UPDATE_BASE + path, headers=headers)
+    def get(url, extra=None):
+        req = urllib.request.Request(url, headers={**headers, **(extra or {})})
         with urllib.request.urlopen(req, timeout=6) as r:
             return r.read().decode("utf-8", "ignore")
+
+    def fetch(path):
+        # Ask GitHub's API first, so a new release shows up within a minute. If the API says no
+        # (for example its limit of 60 checks an hour from one address), use the file server instead.
+        if not UPDATE_TEST_BASE:
+            try:
+                return get(f"{UPDATE_API}{path}?ref=main", {"Accept": "application/vnd.github.raw+json"})
+            except (OSError, ValueError):
+                pass
+        return get(UPDATE_BASE + path)
 
     try:
         latest = json.loads(fetch("/.claude-plugin/plugin.json"))["version"]

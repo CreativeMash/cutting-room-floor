@@ -2,6 +2,10 @@
 
 Each release is listed here, newest first. The Settings page shows the notes for a new version when you check for updates, so keep each entry short and in plain words.
 
+## 1.2.3
+
+- Check for updates sees a new version within a minute of its release. Before, it could say you were up to date for up to 5 minutes afterwards.
+
 ## 1.2.2
 
 - The three summary cards all use white text.
