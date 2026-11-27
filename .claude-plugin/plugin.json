@@ -1,6 +1,6 @@
 {
   "name": "cutting-room-floor",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Sweep up the clutter AI leaves in your projects: unused renders and exports, folder copies, duplicates, build folders and caches. See it all in one page and choose what goes to the Trash. macOS, Windows and Linux.",
   "author": {
     "name": "Creative Mash",
