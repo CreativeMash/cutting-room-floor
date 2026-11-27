@@ -61,10 +61,10 @@ If the person asks to update Cutting Room Floor, or whether there's a newer vers
 1. Run `PYTHON SCRIPT --check-update`. It asks GitHub for the latest version number and prints JSON with `current`, `latest`, `newer`, `notes` and `install`. Nothing about their files is sent. If it has an `error`, pass it on in plain words.
 2. If `newer` is false, tell them they have the latest version.
 3. If `newer` is true, tell them the new version number and summarise `notes`, then ask if they want it. Never update without a yes.
-   - `install` is `claude`: on a yes, run `claude plugin marketplace update creativemash` and then `claude plugin update cutting-room-floor@creativemash`. Then tell them to type `/reload-plugins` (or restart Claude Code) and ask again to run it. If the commands fail, tell them to type `/plugin`, open **Installed**, pick **cutting-room-floor** and choose **Update now**.
+   - `install` is `claude`: on a yes, run `claude plugin marketplace update creativemash` and then `claude plugin update cutting-room-floor@creativemash`. Then tell them to start a new Claude session (or type `/reload-plugins` if they use Claude Code in a terminal) and ask again to run it. If the commands fail, give them `claude plugin update cutting-room-floor@creativemash` to run in Terminal or PowerShell themselves.
    - `install` is `git`: on a yes, run `git -C "FOLDER" pull` with the `folder` from the JSON.
    - `install` is `zip`: tell them to download the new version from the `repo` page and put it in place of the old folder. Their saved folders are kept.
-4. Mention once that they can get updates without asking: type `/plugin`, open **Marketplaces**, pick **creativemash** and turn on auto-update.
+4. Mention once that they can get updates without asking: in Claude Code in a terminal, type `/plugin`, open **Marketplaces**, pick **creativemash** and turn on auto-update. (The `/plugin` menu isn't available in the Claude desktop app.)
 
 Stop a running server before updating, and start it again afterwards.
 

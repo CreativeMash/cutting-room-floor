@@ -18,23 +18,31 @@ Cutting Room Floor finds it across all your project folders, explains each item 
 
 ## Use it with Claude Code
 
-In Claude Code, run:
+Open Terminal (on Windows, PowerShell) and run these two commands. This works whether you use Claude Code in a terminal or in the Claude desktop app:
 
-```
-/plugin marketplace add creativemash/cutting-room-floor
-```
-
-```
-/plugin install cutting-room-floor@creativemash
+```bash
+claude plugin marketplace add CreativeMash/cutting-room-floor
 ```
 
-Then ask Claude something like *"what's on my cutting room floor?"* or *"what's taking up space in my projects?"*. The first time, Claude suggests folders to scan (the projects you've worked on with Claude, plus usual places like `~/Projects` or `Documents\GitHub`), you tick the ones you want, and it remembers them. Then it opens the page and talks you through what it found.
+```bash
+claude plugin install cutting-room-floor@creativemash
+```
+
+If you use Claude Code in a terminal, you can type `/plugin marketplace add CreativeMash/cutting-room-floor` and `/plugin install cutting-room-floor@creativemash` there instead. The `/plugin` commands aren't available in the desktop app.
+
+Then start a new session and ask Claude something like *"what's on my cutting room floor?"* or *"what's taking up space in my projects?"*. The first time, Claude suggests folders to scan (the projects you've worked on with Claude, plus usual places like `~/Projects` or `Documents\GitHub`), you tick the ones you want, and it remembers them. Then it opens the page and talks you through what it found.
 
 ### Getting updates
 
 Updates don't install themselves unless you switch that on. To check, open **Settings** in the page and press **Check for updates**, or just ask Claude to *"update Cutting Room Floor"*.
 
-To update by hand, type `/plugin` in Claude Code, open **Installed**, pick **cutting-room-floor** and choose **Update now**, then type `/reload-plugins`. To get updates automatically, type `/plugin`, open **Marketplaces**, pick **creativemash** and turn on auto-update. Your saved folders are kept between updates.
+To update by hand, run this in Terminal (or PowerShell), then start a new Claude session:
+
+```bash
+claude plugin update cutting-room-floor@creativemash
+```
+
+To get updates automatically, type `/plugin` in Claude Code in a terminal, open **Marketplaces**, pick **creativemash** and turn on auto-update. Your saved folders are kept between updates.
 
 ## Use it without Claude
 

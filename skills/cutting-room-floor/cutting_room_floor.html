@@ -386,8 +386,8 @@ function updBox(u) {
   if (u.error) return `<div class="upd"><h3>${dot("--g-yellow")}Couldn’t check for updates</h3><p>${esc(u.error)}</p></div>`;
   if (!u.newer) return `<div class="upd"><h3>${dot("--g-green")}You’re up to date</h3><p>Version ${esc(u.current)} is the latest.</p></div>`;
   const steps = {
-    claude: `<li>Ask Claude to <b>update Cutting Room Floor</b>. Or type <code>/plugin</code> in Claude Code, open <b>Installed</b>, pick <b>cutting-room-floor</b> and choose <b>Update now</b>.</li>
-      <li>Type <code>/reload-plugins</code>, then ask Claude to run Cutting Room Floor again.</li>`,
+    claude: `<li>Ask Claude to <b>update Cutting Room Floor</b>. Or run this in ${OS.name === "windows" ? "PowerShell" : "Terminal"}:${cmd("claude plugin update cutting-room-floor@creativemash")}</li>
+      <li>Start a new Claude session, then ask Claude to run Cutting Room Floor again.</li>`,
     git: `<li>Close this page, then run this in ${OS.name === "windows" ? "PowerShell" : "Terminal"}:${cmd(`git -C "${u.folder}" pull`)}</li>
       <li>Start Cutting Room Floor again.</li>`,
     zip: `<li><a href="${esc(u.repo)}" target="_blank" rel="noopener">Download the new version from GitHub</a> and put it in place of your old copy. Your folder choices are saved separately, so they stay.</li>
@@ -397,7 +397,7 @@ function updBox(u) {
     <p>You have ${esc(u.current)}. Nothing changes until you update.</p>
     ${u.notes ? `<div class="notes">${esc(u.notes.replace(/^\s*[-*] /gm, "• "))}</div>` : ""}
     <ol>${steps}</ol>
-    ${u.install === "claude" ? `<p>To get updates without asking, type <code>/plugin</code>, open <b>Marketplaces</b>, pick <b>creativemash</b> and turn on auto-update.</p>` : ""}
+    ${u.install === "claude" ? `<p>To get updates without asking, type <code>/plugin</code> in Claude Code in a terminal, open <b>Marketplaces</b>, pick <b>creativemash</b> and turn on auto-update.</p>` : ""}
   </div>`;
 }
 function wireCopy() {
