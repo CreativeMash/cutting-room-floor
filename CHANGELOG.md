@@ -9,5 +9,6 @@ First release.
 - Finds build folders, backups, copies, duplicates, unused media and caches across your project folders.
 - Asks which folders to look at on first use, with suggestions from your Claude Code projects.
 - Choose folders with your computer's own folder window, or paste a location.
+- Remove folders you don't want listed. Removed suggestions stay hidden until you add them again.
 - Settings page with your folders and a check for updates.
 - Works on macOS, Windows and Linux. Everything removed goes to the Trash or Recycle Bin first.

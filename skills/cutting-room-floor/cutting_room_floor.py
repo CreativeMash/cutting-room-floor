@@ -284,8 +284,14 @@ def child_dirs(p: Path) -> int:
         return 0
 
 
-def suggest_folders(current=()):
+def same_path(p) -> str:
+    """A path in a form that can be compared: no trailing slash, and any case on Windows."""
+    return os.path.normcase(os.path.normpath(os.path.expanduser(str(p))))
+
+
+def suggest_folders(current=(), hidden=()):
     sugg = {}
+    hidden = {same_path(h) for h in hidden} - {same_path(c) for c in current}
 
     def entry(p: Path):
         key = str(p)
@@ -332,6 +338,8 @@ def suggest_folders(current=()):
 
     out = []
     for e in sugg.values():
+        if same_path(e["path"]) in hidden:
+            continue
         n = len(e["claude"])
         if e["is_claude_project"]:
             note = "A project you have worked on with Claude."
@@ -925,7 +933,8 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(200, json.dumps(out))
         if path == "/suggest":
             cur = [str(r) for r in self.server.roots]
-            return self.send(200, json.dumps(dict(suggestions=suggest_folders(cur), caches=self.server.caches,
+            hidden = load_config().get("hidden", [])
+            return self.send(200, json.dumps(dict(suggestions=suggest_folders(cur, hidden), caches=self.server.caches,
                                                   first_run=not cur)))
         self.send(404, "{}")
 
@@ -943,7 +952,12 @@ class Handler(BaseHTTPRequestHandler):
             if not roots:
                 return self.send(400, json.dumps({"error": " ".join(problems) or "Pick at least one folder."}))
             caches = bool(body.get("caches", True))
-            save_config(dict(load_config(), roots=[str(r) for r in roots], caches=caches))
+            cfg = load_config()
+            # Folders removed from the list stay hidden from suggestions until picked or pasted again.
+            listed = {same_path(p) for p in body.get("listed") or []} | {same_path(r) for r in roots}
+            hidden = {same_path(h): h for h in cfg.get("hidden", []) + [str(h) for h in body.get("hide") or []]}
+            hidden = [h for k, h in hidden.items() if k not in listed][:200]
+            save_config(dict(cfg, roots=[str(r) for r in roots], caches=caches, hidden=hidden))
             self.server.roots, self.server.caches = roots, caches
             if STATE["status"] != "scanning":
                 threading.Thread(target=run_scan, args=(roots, caches), daemon=True).start()
@@ -1003,7 +1017,7 @@ def main():
                               caches=cfg.get("caches", True)), indent=2))
         return
     if a.suggest:
-        print(json.dumps(suggest_folders(cfg.get("roots", [])), indent=2))
+        print(json.dumps(suggest_folders(cfg.get("roots", []), cfg.get("hidden", [])), indent=2))
         return
     if a.set_roots:
         roots, problems = clean_roots(a.set_roots)

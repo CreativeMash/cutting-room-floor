@@ -52,7 +52,7 @@ python3 skills/cutting-room-floor/cutting_room_floor.py
 py -3 skills\cutting-room-floor\cutting_room_floor.py
 ```
 
-Your browser opens on a folder picker. Tick your project folders, or press **Choose a folder…** to pick one in Finder or Explorer, then press **Start the scan**. The results appear when it's done. Next time it goes straight to the scan. Open **Settings** in the header to change your folders or check for updates.
+Your browser opens on a folder picker. Tick your project folders, or press **Choose a folder…** to pick one in Finder or Explorer, then press **Start the scan**. The results appear when it's done. Next time it goes straight to the scan. Open **Settings** in the header to change your folders or check for updates. Only ticked folders are scanned; use × on a card to take a folder off the list (suggested folders then stay hidden until you add them again).
 
 To update, download the ZIP again and replace the old folder (if you cloned it with Git, run `git pull` instead). Your saved folders are kept.
 

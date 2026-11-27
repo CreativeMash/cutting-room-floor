@@ -151,6 +151,12 @@
   .pick .pk { min-width: 0; }
   .pick .nm { font-size: 19px; }
   .pick .pth, .pick .note { display: block; }
+  .pickbox { position: relative; display: flex; }
+  .pickbox .pick { flex: 1; padding-right: 56px; }
+  .rm { position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; display: grid; place-items: center; transition: background .2s var(--ease), color .2s var(--ease); }
+  .rm:hover, .rm:focus-visible { background: rgba(29,30,27,.08); color: var(--ink); }
+  .rm svg { width: 16px; height: 16px; }
+  .settings .lead-sm { margin: -6px 0 20px; color: var(--muted); max-width: 70ch; }
   .addrow { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 22px; }
   .addrow .or { font: 400 13px var(--mono); color: var(--muted); padding: 0 4px; }
   .addrow input { flex: 1; min-width: 240px; max-width: 480px; height: 48px; padding: 0 18px; border: 0; border-radius: 14px; background: var(--bg); }
@@ -270,15 +276,17 @@ async function openSetup(settings) {
   const r = await (await fetch("/suggest")).json();
   $("#foot").hidden = true; $("#rescan").hidden = true; $("#settings").hidden = true;
   const picks = r.suggestions;
-  const card = s => `<label class="pick"><input type="checkbox" value="${esc(s.path)}" ${s.checked ? "checked" : ""}>
+  const card = (s, suggested) => `<div class="pickbox"${suggested ? ' data-sugg="1"' : ""}><label class="pick"><input type="checkbox" value="${esc(s.path)}" ${s.checked ? "checked" : ""}>
       <span class="pk"><span class="nm">${esc(s.name)}${s.claude ? `<span class="tag">${dot("--g-purple")}Used with Claude</span>` : ""}</span>
-      <span class="pth">${esc(s.display)}</span><span class="note">${esc(s.note || "")}</span></span></label>`;
+      <span class="pth">${esc(s.display)}</span><span class="note">${esc(s.note || "")}</span></span></label>
+      <button class="rm" type="button" aria-label="Remove ${esc(s.name)} from the list" title="Remove from the list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>`;
+  const hide = new Set();
   const win = OS.name === "windows";
   const copyHint = win ? "To copy a folder’s path, hold Shift, right-click the folder in Explorer and choose Copy as path."
     : OS.name === "mac" ? "To copy a folder’s path, select it in Finder, hold Option, right-click and choose Copy as Pathname."
     : "Paste the full path of any folder.";
   const folders = `
-      ${picks.length ? `<div class="picks" id="picks" role="group" aria-label="Folders to look at">${picks.map(card).join("")}</div>`
+      ${picks.length ? `<div class="picks" id="picks" role="group" aria-label="Folders to look at">${picks.map(s => card(s, true)).join("")}</div>`
         : `<p class="hint">We couldn’t find any project folders on our own. Add the folder where you keep your work.</p><div class="picks" id="picks"></div>`}
       <div class="addrow">
         ${APP.can_pick ? `<button class="pill ring" id="pickBtn">Choose a folder…</button><span class="or">or paste one</span>` : ""}
@@ -292,7 +300,8 @@ async function openSetup(settings) {
       <div class="go"><button class="pill solid" id="startScan">${settings ? "Save and scan again" : "Start the scan"}</button>${settings && D ? `<button class="pill ghost" id="cancelSetup">Back to results</button>` : ""}</div>`;
   $("#app").innerHTML = settings ? `
     <div class="intro"><h1>Settings</h1></div>
-    <section class="block settings"><h2>Your folders</h2>${folders}</section>
+    <section class="block settings"><h2>Your folders</h2>
+      <p class="lead-sm">Only ticked folders are looked at. Use × to take a folder off this list. Changes are saved when you scan again.</p>${folders}</section>
     <section class="block settings" id="updates">
       <h2>Updates</h2>
       <p class="ver">You have version <b>${esc(APP.version)}</b>.</p>
@@ -304,7 +313,7 @@ async function openSetup(settings) {
     ${credit()}` : `
     <div class="intro">
       <h1>Which folders should we look at?</h1>
-      <p class="lead">Tick where you keep your projects. Only these are read, and nothing leaves your ${esc(OS.computer)}.</p>
+      <p class="lead">Tick where you keep your projects. Only ticked folders are read, and nothing leaves your ${esc(OS.computer)}.</p>
     </div>
     <section class="block">${folders}</section>
     ${credit()}`;
@@ -323,6 +332,14 @@ async function openSetup(settings) {
   };
   const add = () => { addPath($("#addPath").value); $("#addPath").value = ""; $("#addPath").focus(); };
   $("#addBtn").onclick = add;
+  $("#picks").onclick = e => {
+    const b = e.target.closest(".rm"); if (!b) return;
+    const box = b.closest(".pickbox");
+    if (box.dataset.sugg) hide.add(box.querySelector("input").value);
+    const next = box.nextElementSibling || box.previousElementSibling;
+    box.remove();
+    (next ? next.querySelector(".rm") : $("#addPath")).focus();
+  };
   $("#addPath").onkeydown = e => { if (e.key === "Enter") add(); };
   if ($("#pickBtn")) $("#pickBtn").onclick = async () => {
     const b = $("#pickBtn"), label = b.textContent;
@@ -339,7 +356,8 @@ async function openSetup(settings) {
     const roots = [...document.querySelectorAll("#picks input:checked")].map(i => i.value);
     if (!roots.length) { $("#setupErr").textContent = "Tick at least one folder, or add one."; return; }
     $("#startScan").disabled = true;
-    const res = await post("/setup", { roots, caches: $("#useCaches").checked });
+    const listed = [...document.querySelectorAll("#picks input")].map(i => i.value);
+    const res = await post("/setup", { roots, caches: $("#useCaches").checked, hide: [...hide], listed });
     $("#startScan").disabled = false;
     if (res.error) { $("#setupErr").textContent = res.error; return; }
     sel.clear(); gone.clear(); view = { kind: "all", project: null, q: "" };
