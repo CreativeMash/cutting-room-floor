@@ -30,6 +30,16 @@ In Claude Code, run:
 
 Then ask Claude something like *"what's on my cutting room floor?"* or *"what's taking up space in my projects?"*. The first time, Claude suggests folders to scan (the projects you've worked on with Claude, plus usual places like `~/Projects` or `Documents\GitHub`), you tick the ones you want, and it remembers them. Then it opens the page and talks you through what it found.
 
+### Getting updates
+
+Updates don't install themselves unless you switch that on. To turn on automatic updates, run `/plugin` in Claude Code, open the **Marketplaces** tab, choose **creativemash** and turn on auto-update. To update by hand, run:
+
+```
+/plugin marketplace update creativemash
+```
+
+then `/reload-plugins` (or restart Claude Code). Your saved folders are kept between updates.
+
 ## Use it without Claude
 
 Download this repository (green **Code** button, then **Download ZIP**), unzip it, and run:
@@ -46,7 +56,7 @@ python3 skills/cutting-room-floor/cutting_room_floor.py
 py -3 skills\cutting-room-floor\cutting_room_floor.py
 ```
 
-Your browser opens on a folder picker. Tick your project folders, press **Start the scan**, and the results appear when it's done. Next time it goes straight to the scan. Use **Change folders** in the header to pick again.
+Your browser opens on a folder picker. Tick your project folders, press **Start the scan**, and the results appear when it's done. Next time it goes straight to the scan. Use **Change folders** in the header to pick again. To update, download the ZIP again and replace the old folder; your saved folders are kept.
 
 ## What it looks for
 

@@ -12,7 +12,6 @@
       "name": "cutting-room-floor",
       "source": "./",
       "description": "Sweep up the clutter AI leaves in your projects and choose what goes to the Trash.",
-      "version": "1.0.0",
       "author": {
         "name": "Creative Mash",
         "url": "https://creativemash.ie"
