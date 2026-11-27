@@ -28,15 +28,22 @@ import shutil
 import stat
 import subprocess
 import sys
+import ssl
 import threading
 import time
+import urllib.error
+import urllib.request
 import webbrowser
 from collections import defaultdict
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote
 
-VERSION = "1.0.0"
+VERSION = "1.0.0"  # fallback only: the real version is read from .claude-plugin/plugin.json
+REPO = "CreativeMash/cutting-room-floor"
+REPO_URL = f"https://github.com/{REPO}"
+UPDATE_BASE = os.environ.get("CRF_UPDATE_BASE") or f"https://raw.githubusercontent.com/{REPO}/main"
+PLUGIN_ROOT = Path(__file__).resolve().parent.parent.parent
 IS_WIN = os.name == "nt"
 IS_MAC = sys.platform == "darwin"
 HOME = Path.home()
@@ -791,6 +798,107 @@ def reveal(path: str):
         subprocess.Popen(["xdg-open", str(Path(path).parent)])
 
 
+# ---- the system folder picker ----------------------------------------------
+# A web page is never told a folder's full path, so the picker is opened here,
+# on the person's own computer, and only the chosen path goes back to the page.
+PICK_PROMPT = "Choose a folder for Cutting Room Floor to look at"
+_PICKING = threading.Lock()
+
+
+def can_pick() -> bool:
+    return IS_WIN or IS_MAC or bool(shutil.which("zenity") or shutil.which("kdialog"))
+
+
+def pick_folder() -> dict:
+    if not _PICKING.acquire(blocking=False):
+        return dict(error="A folder window is already open. It may be behind your browser.")
+    try:
+        if IS_MAC:
+            r = _run(["osascript", "-e", "on run argv",
+                      "-e", "POSIX path of (choose folder with prompt (item 1 of argv) default location (POSIX file (item 2 of argv)))",
+                      "-e", "end run", PICK_PROMPT, str(HOME)], timeout=900)
+            if r.returncode != 0:
+                return dict(cancelled=True) if "-128" in r.stderr else dict(error="The folder window couldn't open.")
+        elif IS_WIN:
+            script = ("[Console]::OutputEncoding = [Text.Encoding]::UTF8; Add-Type -AssemblyName System.Windows.Forms; "
+                      "$d = New-Object System.Windows.Forms.FolderBrowserDialog; $d.Description = $env:CRF_PROMPT; "
+                      "$d.ShowNewFolderButton = $false; $d.SelectedPath = $env:USERPROFILE; "
+                      "$o = New-Object System.Windows.Forms.Form -Property @{TopMost = $true; ShowInTaskbar = $false}; "
+                      "if ($d.ShowDialog($o) -eq 'OK') { $d.SelectedPath }")
+            r = _run(["powershell", "-NoProfile", "-NonInteractive", "-STA", "-Command", script],
+                     env=dict(os.environ, CRF_PROMPT=PICK_PROMPT), timeout=900)
+            if r.returncode != 0:
+                return dict(error="The folder window couldn't open.")
+        else:
+            if shutil.which("zenity"):
+                cmd = ["zenity", "--file-selection", "--directory", "--title=" + PICK_PROMPT, "--filename=" + str(HOME) + "/"]
+            elif shutil.which("kdialog"):
+                cmd = ["kdialog", "--getexistingdirectory", str(HOME), "--title", PICK_PROMPT]
+            else:
+                return dict(error="No folder window is available here. Paste the folder's location instead.")
+            r = _run(cmd, timeout=900)
+        chosen = (r.stdout or "").strip()
+        if not chosen:
+            return dict(cancelled=True)
+        return dict(path=chosen.rstrip("/\\") or chosen)
+    except subprocess.TimeoutExpired:
+        return dict(cancelled=True)
+    finally:
+        _PICKING.release()
+
+
+# ---- version and updates ---------------------------------------------------
+def app_version() -> str:
+    try:
+        return json.loads((PLUGIN_ROOT / ".claude-plugin" / "plugin.json").read_text("utf-8"))["version"]
+    except (OSError, ValueError, KeyError):
+        return VERSION
+
+
+def install_type() -> str:
+    """How this copy was installed, so the page can show the right way to update."""
+    if "/.claude/plugins/" in str(Path(__file__).resolve()).replace("\\", "/"):
+        return "claude"
+    return "git" if (PLUGIN_ROOT / ".git").exists() else "zip"
+
+
+def _vtuple(v: str):
+    return tuple(int(x) for x in re.findall(r"\d+", v)[:3]) or (0,)
+
+
+def check_update() -> dict:
+    """Ask GitHub for the latest version number (and its notes). Nothing else is sent."""
+    current = app_version()
+    headers = {"User-Agent": f"cutting-room-floor/{current}"}
+
+    def fetch(path):
+        req = urllib.request.Request(UPDATE_BASE + path, headers=headers)
+        with urllib.request.urlopen(req, timeout=6) as r:
+            return r.read().decode("utf-8", "ignore")
+
+    try:
+        latest = json.loads(fetch("/.claude-plugin/plugin.json"))["version"]
+    except urllib.error.HTTPError:
+        return dict(current=current, error="Update information isn't available right now. Try again later.")
+    except urllib.error.URLError as e:
+        if isinstance(e.reason, ssl.SSLError):
+            hint = (" On a Mac, open the Python folder in Applications and run Install Certificates." if IS_MAC else "")
+            return dict(current=current, error="Python couldn't verify GitHub's security certificate." + hint)
+        return dict(current=current, error="Couldn't reach GitHub. Check your internet connection and try again.")
+    except (OSError, ValueError, KeyError):
+        return dict(current=current, error="Couldn't read the update information. Try again later.")
+    newer = _vtuple(latest) > _vtuple(current)
+    notes = ""
+    if newer:
+        try:
+            m = re.search(r"^## *" + re.escape(latest) + r"[^\n]*\n(.*?)(?=^## |\Z)", fetch("/CHANGELOG.md"), re.S | re.M)
+            notes = m.group(1).strip()[:1500] if m else ""
+        except Exception:
+            pass
+    return dict(current=current, latest=latest, newer=newer, notes=notes, install=install_type(),
+                repo=REPO_URL, folder=str(PLUGIN_ROOT))
+
+
 # ---- the local web page ----------------------------------------------------
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, *a):
@@ -812,7 +920,8 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(200, html.replace("__TOKEN__", TOKEN), "text/html; charset=utf-8")
         if path == "/state":
             out = {k: STATE[k] for k in ("status", "progress", "data", "error")}
-            out.update(os=OS_INFO, home=str(HOME), sep=os.sep, version=VERSION)
+            out.update(os=OS_INFO, home=str(HOME), sep=os.sep, version=app_version(), install=install_type(), can_pick=can_pick(),
+                       check_updates=bool(load_config().get("check_updates", False)))
             return self.send(200, json.dumps(out))
         if path == "/suggest":
             cur = [str(r) for r in self.server.roots]
@@ -856,6 +965,14 @@ class Handler(BaseHTTPRequestHandler):
                 except Exception as e:
                     results.append(dict(id=iid, ok=False, msg=str(e)))
             return self.send(200, json.dumps({"results": results}))
+        if path == "/pick-folder":
+            return self.send(200, json.dumps(pick_folder()))
+        if path == "/check-update":
+            return self.send(200, json.dumps(check_update()))
+        if path == "/prefs":
+            if "check_updates" in body:
+                save_config(dict(load_config(), check_updates=bool(body["check_updates"])))
+            return self.send(200, "{}")
         if path == "/rescan":
             if STATE["status"] != "scanning" and self.server.roots:
                 threading.Thread(target=run_scan, args=(self.server.roots, self.server.caches), daemon=True).start()
@@ -873,9 +990,14 @@ def main():
     ap.add_argument("--no-caches", action="store_true", help="Skip app and download caches")
     ap.add_argument("--port", type=int, default=8765, help="Port for the page (the next free one is used if taken)")
     ap.add_argument("--no-browser", action="store_true", help="Do not open the page automatically")
+    ap.add_argument("--check-update", action="store_true", help="Ask GitHub whether a newer version exists, print JSON, then exit")
+    ap.add_argument("--version", action="version", version=f"Cutting Room Floor {app_version()}")
     a = ap.parse_args()
     cfg = load_config()
 
+    if a.check_update:
+        print(json.dumps(check_update(), indent=2))
+        return
     if a.show_config:
         print(json.dumps(dict(config_file=str(config_path()), roots=cfg.get("roots", []),
                               caches=cfg.get("caches", True)), indent=2))

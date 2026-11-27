@@ -151,8 +151,9 @@
   .pick .pk { min-width: 0; }
   .pick .nm { font-size: 19px; }
   .pick .pth, .pick .note { display: block; }
-  .addrow { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
-  .addrow input { flex: 1; min-width: 240px; max-width: 560px; height: 48px; padding: 0 18px; border: 0; border-radius: 14px; background: var(--bg); }
+  .addrow { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 22px; }
+  .addrow .or { font: 400 13px var(--mono); color: var(--muted); padding: 0 4px; }
+  .addrow input { flex: 1; min-width: 240px; max-width: 480px; height: 48px; padding: 0 18px; border: 0; border-radius: 14px; background: var(--bg); }
   .addrow input::placeholder { color: var(--muted); }
   .hint { font-size: 14px; color: var(--muted); margin: 10px 0 0; max-width: 70ch; }
   .opt { display: flex; gap: 12px; align-items: flex-start; margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--rule); cursor: pointer; max-width: 70ch; }
@@ -160,6 +161,17 @@
   .opt span { color: var(--muted); } .opt b { color: var(--ink); font-weight: 500; }
   .err { color: #b3261e; font-weight: 500; margin: 18px 0 0; min-height: 1.5em; }
   .go { display: flex; gap: 8px; margin-top: 8px; }
+  .settings h2 { font-size: clamp(26px, 2.4vw, 36px); margin-bottom: 18px; }
+  section.block.settings { margin-bottom: clamp(40px, 5vw, 72px); }
+  .ver { margin: 0 0 18px; color: var(--muted); } .ver b { color: var(--ink); font-weight: 500; }
+  .upd { margin-top: 18px; padding: 22px 24px; border-radius: 20px; background: var(--bg); max-width: 760px; }
+  .upd h3 { margin: 0; font-size: 20px; font-weight: 500; letter-spacing: -.02em; display: flex; align-items: center; gap: 10px; }
+  .upd p { margin: 10px 0 0; color: var(--muted); }
+  .upd .notes { margin: 14px 0 0; padding: 14px 18px; border-radius: 14px; background: var(--paper); white-space: pre-wrap; font: 400 13.5px/1.6 var(--sans); color: var(--ink); }
+  .upd ol { margin: 14px 0 0; padding-left: 22px; } .upd li { margin: 8px 0; } .upd li::marker { color: var(--muted); }
+  .cmd { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+  .cmd code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; padding: 10px 14px; border-radius: 12px; background: var(--paper); font: 400 13px var(--mono); }
+  .updbar { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin: 0 0 18px; padding: 10px 10px 10px 18px; border-radius: 999px; background: var(--bg); font-weight: 500; width: fit-content; }
   .intro { padding: clamp(20px, 3vw, 44px) 0 clamp(28px, 3vw, 44px); }
   .intro h1 { max-width: 16ch; }
   .credit { margin: 0; padding: 28px 0 0; border-top: 1px solid var(--rule); font: 400 13px var(--mono); color: var(--muted); }
@@ -179,7 +191,7 @@
   <a class="home" href="https://creativemash.ie" target="_blank" rel="noopener" aria-label="Creative Mash website"><svg class="logo" role="img" aria-label="Creative Mash" viewBox="0 0 374.39701 53.935" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M27.05169,41.02078c-1.57602,1.71301-3.76401,2.56802-6.56601,2.56802-2.063,0-3.814-.39902-5.25299-1.19601-1.44-.797-2.60701-1.858-3.50201-3.181-.89499-1.323-1.54599-2.811-1.95499-4.465-.408-1.65298-.612-3.35599-.612-5.10699,0-1.828.20399-3.59799.612-5.311.409-1.71201,1.06-3.23901,1.95499-4.58099.895-1.34302,2.06201-2.41299,3.50201-3.211,1.439-.797,3.18999-1.19601,5.25299-1.19601,1.12801,0,2.20801.185,3.23898.55499,1.03101.37003,1.95502.88501,2.77301,1.54602.81699.66199,1.49701,1.42999,2.04199,2.306.54501.875.89502,1.83798,1.05099,2.888h8.871c-.27298-2.41202-.93399-4.552-1.98398-6.42001-1.05099-1.867-2.384-3.43298-3.99802-4.698-1.61499-1.26401-3.444-2.22699-5.48599-2.88901-2.043-.66098-4.21301-.99197-6.508-.99197-3.19099,0-6.061.56497-8.60899,1.69299-2.548,1.129-4.698,2.68399-6.44901,4.66901-1.75099,1.98398-3.093,4.31-4.02699,6.974C.46666,23.63881-.00033,26.52781-.00033,29.63981-.00033,32.67481.46667,35.50581,1.40067,38.13181c.93399,2.62601,2.276,4.91299,4.02699,6.858,1.75101,1.94598,3.901,3.47198,6.44901,4.58099,2.54799,1.10901,5.418,1.664,8.60899,1.664,2.56799,0,4.922-.39001,7.06198-1.168,2.13901-.77802,4.00702-1.90601,5.60303-3.38501,1.59497-1.478,2.879-3.26801,3.85199-5.36899.97198-2.10101,1.57599-4.45502,1.80899-7.06201h-8.871c-.35001,2.80099-1.31299,5.05801-2.88898,6.76999"/><path d="M58.77209,19.77649c-.97302.31201-1.888.75-2.74301,1.31302-.85602.565-1.61499,1.246-2.276,2.043-.66202.798-1.18799,1.66299-1.57599,2.59698h-.117v-5.603h-7.879v30.17401h8.28799v-13.599c0-1.36099.13599-2.62601.40799-3.793s.73001-2.189,1.37201-3.064c.642-.87601,1.48801-1.56601,2.539-2.07202,1.04999-.50497,2.33398-.75897,3.85199-.75897.505,0,1.03.02899,1.57501.08798.54498.05801,1.01199.12601,1.401.20401v-7.70401c-.66202-.194-1.26501-.29199-1.80902-.29199-1.05099,0-2.06299.15601-3.03497.46698"/><path d="M91.19378,24.79559c-1.22598-1.672-2.793-3.005-4.69901-3.99799-1.90698-.992-4.14398-1.48801-6.71198-1.48801-2.29602,0-4.38702.409-6.27402,1.22598-1.88699.81702-3.51199,1.936-4.87299,3.35602-1.362,1.41998-2.41299,3.103-3.15201,5.048-.73901,1.94598-1.10901,4.047-1.10901,6.30298,0,2.33502.36002,4.47501,1.08002,6.42001.72,1.94598,1.741,3.61899,3.064,5.01999,1.323,1.39999,2.93799,2.48001,4.84399,3.23901,1.90601.758,4.047,1.138,6.42001,1.138,3.42398,0,6.34198-.77802,8.755-2.33502,2.41199-1.55499,4.202-4.14398,5.36899-7.76199h-7.29501c-.27298.93402-1.01199,1.819-2.21799,2.65601s-2.646,1.254-4.319,1.254c-2.33401,0-4.12399-.60199-5.36899-1.80899-1.246-1.20502-1.92603-3.15201-2.043-5.836h21.76999c.155-2.33499-.04001-4.57199-.58401-6.71201-.54498-2.14001-1.42999-4.04599-2.655-5.72M72.66281,31.97458c.03799-.58398.16498-1.245.379-1.98398.21399-.73901.58398-1.439,1.10898-2.10202.526-.66098,1.22601-1.215,2.10101-1.66299.87601-.44699,1.97501-.67099,3.298-.67099,2.02298,0,3.53101.54498,4.52298,1.634.992,1.09,1.68301,2.685,2.07202,4.78598h-13.48199Z"/><path d="M126.41549,43.5889v-15.70001c0-1.828-.409-3.297-1.22601-4.40601-.81699-1.10901-1.86801-1.97501-3.15201-2.59799-1.284-.621-2.70499-1.04001-4.25998-1.254-1.55701-.21402-3.09399-.32101-4.61102-.32101-1.67297,0-3.33698.16602-4.98999.496-1.65399.33099-3.14301.88501-4.465,1.66299-1.323.77902-2.41299,1.80902-3.26801,3.09302-.85699,1.284-1.34299,2.89899-1.45898,4.845h8.28699c.155-1.63501.70099-2.802,1.63501-3.50201.93298-.70099,2.21698-1.05099,3.85199-1.05099.73801,0,1.42902.04999,2.07101.146.642.09799,1.20599.29199,1.69299.58401.48599.29199.875.69998,1.16699,1.22498.29199.526.43802,1.23602.43802,2.13101.03799.85602-.21402,1.508-.759,1.95502-.54501.448-1.28403.78799-2.21802,1.021-.93298.23398-2.004.409-3.20999.526-1.20599.116-2.43201.272-3.67599.466-1.246.19498-2.48102.45798-3.707.78799-1.22501.33099-2.315.827-3.26801,1.48898-.95401.66202-1.73199,1.54602-2.33401,2.655-.60397,1.10901-.905,2.52002-.905,4.23102,0,1.55698.26202,2.89999.78802,4.02798.52499,1.129,1.25497,2.06201,2.18799,2.80099.93399.74002,2.02301,1.284,3.26901,1.634,1.245.35001,2.58698.526,4.02698.526,1.867,0,3.69601-.27298,5.48602-.81799,1.78897-.54401,3.34598-1.49701,4.66898-2.85901.03799.50601.10699,1.00201.20401,1.48801.09698.487.224.96301.38,1.42999h8.40399c-.38901-.62198-.66199-1.556-.81699-2.802-.15601-1.245-.233-2.54797-.233-3.90997M118.1275,38.62787c0,.46701-.04901,1.09003-.14603,1.86801-.09698.77802-.35999,1.54599-.78799,2.30499s-1.09,1.41101-1.98401,1.95502c-.896.54498-2.15997.81699-3.79398.81699-.66202,0-1.30402-.05798-1.92599-.17499-.62302-.117-1.16702-.32101-1.634-.61301-.46701-.29099-.83701-.69-1.10901-1.19598-.27301-.505-.409-1.12802-.409-1.86801,0-.77802.13599-1.42001.409-1.92599.272-.505.63199-.923,1.07999-1.254.44702-.33102.97202-.59302,1.57501-.78802.603-.19498,1.216-.35098,1.83899-.46698.66101-.117,1.32202-.21402,1.98401-.29199.66199-.078,1.29401-.17502,1.897-.29202s1.16699-.263,1.69299-.43799c.52499-.17499.96301-.41699,1.31302-.729v3.09299-.00002Z"/><path d="M143.33978,11.08038h-8.28802v9.04602h-5.01898v5.54498h5.01898v17.80099c0,1.51703.25302,2.74301.759,3.677.505.93402,1.19702,1.65402,2.07202,2.15903.87598.50598,1.88699.84598,3.03497,1.021,1.147.17499,2.36401.263,3.64801.263.81702,0,1.65302-.02002,2.509-.05801.85599-.039,1.634-.117,2.33499-.23401v-6.41998c-.38898.07901-.798.13699-1.22598.17499-.42801.04001-.875.05902-1.34201.05902-1.401,0-2.33499-.23401-2.802-.70102-.46701-.46698-.69998-1.39999-.69998-2.80099v-14.94101h6.06998v-5.54498h-6.06998v-9.04604Z"/><rect x="153.61099" y="20.12698" width="8.28799" height="30.17401"/><rect x="153.61099" y="8.62997" width="8.28799" height="6.828"/><polygon points="180.75009 40.7291 180.63308 40.7291 174.27206 20.12711 165.57507 20.12711 175.90606 50.30112 185.12707 50.30112 195.34106 20.12711 187.11209 20.12711 180.75009 40.7291"/><path d="M224.14337,24.79559c-1.22598-1.672-2.793-3.005-4.69901-3.99799-1.90698-.992-4.14398-1.48801-6.71198-1.48801-2.29602,0-4.38702.409-6.27402,1.22598-1.88699.81702-3.51199,1.936-4.87299,3.35602-1.362,1.41998-2.41299,3.103-3.15201,5.048-.73901,1.94598-1.10901,4.047-1.10901,6.30298,0,2.33502.36002,4.47501,1.08002,6.42001.72,1.94598,1.741,3.61899,3.064,5.01999,1.323,1.39999,2.93799,2.48001,4.84399,3.23901,1.90601.758,4.047,1.138,6.42001,1.138,3.42398,0,6.34198-.77802,8.755-2.33502,2.41199-1.55499,4.202-4.14398,5.36899-7.76199h-7.29501c-.27298.93402-1.01199,1.819-2.21799,2.65601s-2.646,1.254-4.319,1.254c-2.33401,0-4.125-.60199-5.36899-1.80899-1.246-1.20502-1.92603-3.15201-2.043-5.836h21.76999c.155-2.33499-.04001-4.57199-.58401-6.71201-.54498-2.14001-1.42999-4.04599-2.655-5.72M205.61239,31.97458c.03799-.58398.16498-1.245.379-1.98398.21399-.73901.58398-1.439,1.10898-2.10202.526-.66098,1.22601-1.215,2.10101-1.66299.87601-.44699,1.97501-.67099,3.298-.67099,2.02298,0,3.53101.54498,4.52298,1.634.992,1.09,1.68301,2.685,2.07202,4.78598h-13.48199Z"/><path d="M260.32107,20.70041L246.25106-.00061h-14.23199v53.935h17.224v-19.40698l11.078,16.173,10.99799-16.173v19.40698h17.22302V-.00061h-14.23203l-13.98898,20.70102ZM280.45608,6.46838v40.99701h-2.10205V10.3494l-18.03296,26.36099-18.11301-26.36099v37.116h-2.10199V6.46838h2.10199l18.11301,26.604,18.03296-26.604s2.10205,0,2.10205,0Z"/><path d="M300.44705,19.5766c-1.85498,0-3.40698.405-4.62201,1.28198-1.31598.87802-2.12598,2.16-2.46301,3.81302l.776.06699c.30402-1.41599,1.04602-2.53,2.22699-3.272,1.07904-.74298,2.46301-1.07999,4.08203-1.07999,3.914,0,5.90503,1.991,5.90503,6.00598v1.28201l-4.85901.034c-2.69904,0-4.79102.405-6.20801,1.21399-1.72101.91101-2.56403,2.39603-2.56403,4.42001,0,1.41699.54004,2.564,1.65302,3.40799,1.01202.81,2.362,1.215,3.98102,1.215,1.755,0,3.40796-.53998,5.02795-1.552,1.24805-.84399,2.22705-1.82199,2.96906-2.93597v4.01498h.81v-11.30301c0-1.92297-.50604-3.44098-1.48505-4.58798-1.14697-1.35001-2.90198-2.02499-5.22998-2.02499M306.35208,30.91357c0,1.35001-.81006,2.733-2.42902,4.08301-1.68701,1.41699-3.50903,2.159-5.466,2.159-1.48499,0-2.69904-.33698-3.57703-1.01199-.91101-.67499-1.349-1.62-1.349-2.767,0-3.23898,2.63104-4.85901,7.96204-4.85901l4.85901-.03299v2.42899h0Z"/><path d="M321.76321,26.3989c-2.815-1.189-5.31805-2.62799-5.31805-5.44299,0-2.44,1.69-4.31598,4.06702-4.31598,3.065,0,5.255,2.50198,6.44299,6.19299l1.62701-.375c-.18799-1.564-.87598-5.255-1.37598-6.694-1.31403-.50101-3.00305-1.064-5.56799-1.064-5.75604,0-9.50903,3.69098-9.50903,8.07098,0,4.81702,4.06598,6.88101,7.82001,8.633,3.12799,1.439,4.94202,2.94,4.94202,5.69302,0,2.62698-2.12701,4.379-4.44202,4.379-3.75403,0-6.56903-3.62802-7.69501-7.75702l-1.62598.31201c0,2.25198.56299,6.50699,1.00098,7.38199,1.12598.939,4.00403,2.12802,7.19403,2.12802,5.00494,0,10.323-2.94101,10.323-8.634,0-4.31702-3.19104-6.569-7.883-8.50803"/><path d="M374.39828,8.88068v-1.82397h-17.00104v1.82397c5.08099.45602,5.60199.78201,5.60199,6.18802v10.55301h-22.21295v-10.55301c0-5.40601.52197-5.73199,5.47198-6.18802v-1.82397h-16.87103v1.82397c5.341.45602,5.86304.716,5.86304,6.18802v26.31601c0,5.47198-.52203,5.79797-5.73303,6.189v1.823h17.13202v-1.823c-5.341-.39102-5.86298-.78201-5.86298-6.189v-13.02802h22.21295v13.02802c0,5.47198-.58698,5.79797-6.12299,6.189v1.823h17.45703v-1.823c-5.276-.39102-5.79706-.71701-5.79706-6.189V15.0687c0-5.40601.52106-5.73199,5.86206-6.18802"/></svg></a>
   <span class="crumb">/ Cutting Room Floor</span>
   <span class="spacer"></span>
-  <button class="pill ghost sm" id="folders" hidden>Change folders</button>
+  <button class="pill ghost sm" id="settings" hidden>Settings</button>
   <button class="pill ring sm" id="rescan" hidden>Scan again</button>
 </div></header>
 
@@ -222,6 +234,7 @@ const RISK = { safe: ["Safe to remove", "--g-green"], review: ["Worth a look", "
 const ICON_OUT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>';
 let D = null, view = { kind: "all", project: null, q: "" };
 let OS = { computer: "computer", reveal: "Show in folder", bin: "Trash" }, HOME_DIR = "", SEP = "/";
+let APP = { version: "", install: "zip", can_pick: false, check_updates: false }, UPD = null, autoChecked = false;
 const sel = new Set(), gone = new Set();
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -236,57 +249,91 @@ async function post(url, body) {
   return r.json();
 }
 function scanning() {
-  $("#foot").hidden = true; $("#rescan").hidden = true; $("#folders").hidden = true;
+  $("#foot").hidden = true; $("#rescan").hidden = true; $("#settings").hidden = true;
   $("#app").innerHTML = `<div class="loading"><h1>Checking the cutting room floor</h1><p id="prog" class="lead"></p></div>`;
 }
 async function poll() {
   const s = await (await fetch("/state")).json();
   OS = s.os; HOME_DIR = s.home; SEP = s.sep;
+  APP = { version: s.version, install: s.install, can_pick: s.can_pick, check_updates: s.check_updates };
   $("#trashBtn").textContent = $("#dlgOk").textContent = `Move to ${OS.bin}`;
   if (s.status === "setup") { openSetup(); return; }
-  if (s.status === "ready") { D = s.data; render(); return; }
+  if (s.status === "ready") { D = s.data; render(); autoCheck(); return; }
   if (s.status === "error") { $("#app").innerHTML = `<div class="loading"><h1>The scan stopped</h1><code>${esc(s.error)}</code></div>`; return; }
-  if (!$("#prog") || !$(".loading h1").textContent.startsWith("Looking")) scanning();
+  if (!$("#prog") || !$(".loading h1").textContent.startsWith("Checking")) scanning();
   $("#prog").innerHTML = `<code>${esc(s.progress || "Starting")}</code>`;
   setTimeout(poll, 600);
 }
 
-// ---- first run: pick the folders to look at ----
-async function openSetup(change) {
+// ---- first run and Settings: the folders to look at, and updates ----
+async function openSetup(settings) {
   const r = await (await fetch("/suggest")).json();
-  $("#foot").hidden = true; $("#rescan").hidden = true; $("#folders").hidden = true;
+  $("#foot").hidden = true; $("#rescan").hidden = true; $("#settings").hidden = true;
   const picks = r.suggestions;
   const card = s => `<label class="pick"><input type="checkbox" value="${esc(s.path)}" ${s.checked ? "checked" : ""}>
       <span class="pk"><span class="nm">${esc(s.name)}${s.claude ? `<span class="tag">${dot("--g-purple")}Used with Claude</span>` : ""}</span>
       <span class="pth">${esc(s.display)}</span><span class="note">${esc(s.note || "")}</span></span></label>`;
-  $("#app").innerHTML = `
+  const win = OS.name === "windows";
+  const copyHint = win ? "To copy a folder’s path, hold Shift, right-click the folder in Explorer and choose Copy as path."
+    : OS.name === "mac" ? "To copy a folder’s path, select it in Finder, hold Option, right-click and choose Copy as Pathname."
+    : "Paste the full path of any folder.";
+  const folders = `
+      ${picks.length ? `<div class="picks" id="picks" role="group" aria-label="Folders to look at">${picks.map(card).join("")}</div>`
+        : `<p class="hint">We couldn’t find any project folders on our own. Add the folder where you keep your work.</p><div class="picks" id="picks"></div>`}
+      <div class="addrow">
+        ${APP.can_pick ? `<button class="pill ring" id="pickBtn">Choose a folder…</button><span class="or">or paste one</span>` : ""}
+        <input id="addPath" aria-label="Folder location" placeholder="${win ? "For example C:\\Users\\you\\Work" : "For example ~/Work"}">
+        <button class="pill ${APP.can_pick ? "ghost" : "ring"}" id="addBtn">Add</button>
+      </div>
+      <p class="hint">${copyHint}</p>
+      <label class="opt"><input type="checkbox" id="useCaches" ${r.caches ? "checked" : ""}>
+        <span><b>Also measure app caches.</b> Download and app caches outside your projects, which apps rebuild when needed.</span></label>
+      <p class="err" id="setupErr" role="alert"></p>
+      <div class="go"><button class="pill solid" id="startScan">${settings ? "Save and scan again" : "Start the scan"}</button>${settings && D ? `<button class="pill ghost" id="cancelSetup">Back to results</button>` : ""}</div>`;
+  $("#app").innerHTML = settings ? `
+    <div class="intro"><h1>Settings</h1></div>
+    <section class="block settings"><h2>Your folders</h2>${folders}</section>
+    <section class="block settings" id="updates">
+      <h2>Updates</h2>
+      <p class="ver">You have version <b>${esc(APP.version)}</b>.</p>
+      <div class="go"><button class="pill ring" id="checkUpd">Check for updates</button></div>
+      <div id="updOut">${UPD ? updBox(UPD) : ""}</div>
+      <label class="opt"><input type="checkbox" id="autoUpd" ${APP.check_updates ? "checked" : ""}>
+        <span><b>Check each time I open Cutting Room Floor.</b> This only asks GitHub for the latest version number. Nothing about your files leaves your ${esc(OS.computer)}.</span></label>
+    </section>
+    ${credit()}` : `
     <div class="intro">
       <h1>Which folders should we look at?</h1>
       <p class="lead">Tick where you keep your projects. Only these are read, and nothing leaves your ${esc(OS.computer)}.</p>
     </div>
-    <section class="block">
-      ${picks.length ? `<div class="picks" id="picks" role="group" aria-label="Folders to look at">${picks.map(card).join("")}</div>`
-        : `<p class="hint">We could not find any project folders on our own. Add the folder where you keep your work below.</p><div class="picks" id="picks"></div>`}
-      <div class="addrow">
-        <input id="addPath" aria-label="Folder path" placeholder="${OS.name === "windows" ? "For example C:\\Users\\you\\Work" : "For example ~/Work"}">
-        <button class="pill ring" id="addBtn">Add folder</button>
-      </div>
-      <p class="hint">${OS.name === "windows" ? "To copy a folder’s path, hold Shift, right-click the folder in Explorer and choose Copy as path." : OS.name === "mac" ? "To copy a folder’s path, select it in Finder, hold Option, right-click and choose Copy as Pathname." : "Paste the full path of any folder."}</p>
-      <label class="opt"><input type="checkbox" id="useCaches" ${r.caches ? "checked" : ""}>
-        <span><b>Also measure app caches.</b> Download and app caches outside your projects, which apps rebuild when needed.</span></label>
-      <p class="err" id="setupErr" role="alert"></p>
-      <div class="go"><button class="pill solid" id="startScan">Start the scan</button>${change ? `<button class="pill ghost" id="cancelSetup">Cancel</button>` : ""}</div>
-    </section>
+    <section class="block">${folders}</section>
     ${credit()}`;
-  const add = () => {
-    const v = $("#addPath").value.trim().replace(/^["']|["']$/g, "");
+
+  const addPath = v => {
+    v = v.trim().replace(/^["']|["']$/g, "");
+    if (/^~(?=$|[\\/])/.test(v) && HOME_DIR) v = HOME_DIR + v.slice(1);
+    if (v.length > 1 && !/^[A-Za-z]:[\\/]$/.test(v)) v = v.replace(/[\\/]+$/, "");
     if (!v) return;
+    const same = p => SEP === "\\" ? p.toLowerCase() === v.toLowerCase() : p === v;
+    const have = [...document.querySelectorAll("#picks input")].find(i => same(i.value));
+    if (have) { have.checked = true; have.closest(".pick").scrollIntoView({ block: "nearest" }); return; }
     const name = v.replace(/[\\/]+$/, "").split(/[\\/]/).pop() || v;
-    $("#picks").insertAdjacentHTML("beforeend", card({ path: v, display: v, name, note: "Added by you.", checked: true }));
-    $("#addPath").value = ""; $("#addPath").focus();
+    $("#picks").insertAdjacentHTML("beforeend", card({ path: v, display: tilde(v), name, note: "Added by you.", checked: true }));
+    $("#setupErr").textContent = "";
   };
+  const add = () => { addPath($("#addPath").value); $("#addPath").value = ""; $("#addPath").focus(); };
   $("#addBtn").onclick = add;
   $("#addPath").onkeydown = e => { if (e.key === "Enter") add(); };
+  if ($("#pickBtn")) $("#pickBtn").onclick = async () => {
+    const b = $("#pickBtn"), label = b.textContent;
+    b.disabled = true; b.textContent = `Choose a folder in the window that opened`;
+    try {
+      const res = await post("/pick-folder");
+      if (res.path) addPath(res.path);
+      else if (res.error) $("#setupErr").textContent = res.error;
+    } catch (e) { $("#setupErr").textContent = "The folder window couldn’t open. Paste the folder’s location instead."; }
+    b.disabled = false; b.textContent = label;
+  };
   if ($("#cancelSetup")) $("#cancelSetup").onclick = () => render();
   $("#startScan").onclick = async () => {
     const roots = [...document.querySelectorAll("#picks input:checked")].map(i => i.value);
@@ -298,8 +345,51 @@ async function openSetup(change) {
     sel.clear(); gone.clear(); view = { kind: "all", project: null, q: "" };
     scanning(); setTimeout(poll, 400);
   };
+  if (!settings) return;
+  $("#checkUpd").onclick = async () => {
+    const b = $("#checkUpd"); b.disabled = true; b.textContent = "Checking…";
+    try { UPD = await post("/check-update"); } catch (e) { UPD = { error: "Couldn’t check just now. Try again." }; }
+    b.disabled = false; b.textContent = "Check for updates";
+    $("#updOut").innerHTML = updBox(UPD); wireCopy();
+  };
+  $("#autoUpd").onchange = e => { APP.check_updates = e.target.checked; post("/prefs", { check_updates: e.target.checked }); };
+  wireCopy();
+  if (settings === "updates") $("#updates").scrollIntoView({ block: "start" });
 }
-$("#folders").onclick = () => openSetup(true);
+$("#settings").onclick = () => openSetup(true);
+
+// ---- updates: never installed from here, only explained ----
+const cmd = c => `<div class="cmd"><code>${esc(c)}</code><button class="pill ghost sm" data-copy="${esc(c)}">Copy</button></div>`;
+function updBox(u) {
+  if (u.error) return `<div class="upd"><h3>${dot("--g-yellow")}Couldn’t check for updates</h3><p>${esc(u.error)}</p></div>`;
+  if (!u.newer) return `<div class="upd"><h3>${dot("--g-green")}You’re up to date</h3><p>Version ${esc(u.current)} is the latest.</p></div>`;
+  const steps = {
+    claude: `<li>Ask Claude to <b>update Cutting Room Floor</b>. Or type <code>/plugin</code> in Claude Code, open <b>Installed</b>, pick <b>cutting-room-floor</b> and choose <b>Update now</b>.</li>
+      <li>Type <code>/reload-plugins</code>, then ask Claude to run Cutting Room Floor again.</li>`,
+    git: `<li>Close this page, then run this in ${OS.name === "windows" ? "PowerShell" : "Terminal"}:${cmd(`git -C "${u.folder}" pull`)}</li>
+      <li>Start Cutting Room Floor again.</li>`,
+    zip: `<li><a href="${esc(u.repo)}" target="_blank" rel="noopener">Download the new version from GitHub</a> and put it in place of your old copy. Your folder choices are saved separately, so they stay.</li>
+      <li>Start Cutting Room Floor again.</li>`,
+  }[u.install] || "";
+  return `<div class="upd"><h3>${dot("--g-pink")}Version ${esc(u.latest)} is available</h3>
+    <p>You have ${esc(u.current)}. Nothing changes until you update.</p>
+    ${u.notes ? `<div class="notes">${esc(u.notes.replace(/^\s*[-*] /gm, "• "))}</div>` : ""}
+    <ol>${steps}</ol>
+    ${u.install === "claude" ? `<p>To get updates without asking, type <code>/plugin</code>, open <b>Marketplaces</b>, pick <b>creativemash</b> and turn on auto-update.</p>` : ""}
+  </div>`;
+}
+function wireCopy() {
+  document.querySelectorAll("[data-copy]").forEach(b => b.onclick = async () => {
+    try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = "Copied"; } catch (e) { b.textContent = "Select and copy"; }
+    setTimeout(() => b.textContent = "Copy", 1600);
+  });
+}
+async function autoCheck() {
+  if (autoChecked || !APP.check_updates) return;
+  autoChecked = true;
+  try { UPD = await post("/check-update"); } catch (e) { return; }
+  if (UPD.newer && $(".intro .eyebrow")) render();
+}
 
 function totals() {
   const live = D.items.filter(i => !gone.has(i.id));
@@ -322,6 +412,7 @@ function render() {
 
   $("#app").innerHTML = `
     <div class="intro">
+      ${UPD && UPD.newer ? `<p class="updbar">${dot("--g-pink")}Version ${esc(UPD.latest)} of Cutting Room Floor is available<button class="pill ring sm" id="seeUpd">See how to update</button></p>` : ""}
       <p class="eyebrow">Scanned ${esc(D.scanned_at)}</p>
       <h1>What’s on your cutting room floor?</h1>
       <p class="lead">Leftover renders, test runs, copies and build files in ${D.roots.map(r => `<code>${esc(tilde(r))}</code>`).join(", ")}${D.caches ? " and your app caches" : ""}. Nothing is removed until you choose it, and anything you remove goes to the ${esc(OS.bin)} first.</p>
@@ -375,7 +466,8 @@ function render() {
   $("#q").oninput = e => { view.q = e.target.value; renderList(); };
   if ($("#unproj")) $("#unproj").onclick = () => { view.project = null; render(); };
   $("#rescan").hidden = false;
-  $("#folders").hidden = false;
+  $("#settings").hidden = false;
+  if ($("#seeUpd")) $("#seeUpd").onclick = () => openSetup("updates");
   $("#foot").hidden = false;
   renderList();
 }

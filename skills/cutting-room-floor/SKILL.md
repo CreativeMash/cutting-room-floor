@@ -1,6 +1,6 @@
 ---
 name: cutting-room-floor
-description: Sweep up the clutter that builds up in the person's project folders when they and their AI tools make things. Finds what is taking up disk space (rebuildable build folders like node_modules, backups and copies, media no project uses, duplicate files, app caches) and open a page where they choose what to move to the Trash or Recycle Bin. Use when someone asks why their disk is full, what is wasting space in their projects, which files their projects or AI tools left behind, what's on their cutting room floor, or asks to run Cutting Room Floor.
+description: Sweep up the clutter that builds up in the person's project folders when they and their AI tools make things. Finds what is taking up disk space (rebuildable build folders like node_modules, backups and copies, media no project uses, duplicate files, app caches) and open a page where they choose what to move to the Trash or Recycle Bin. Use when someone asks why their disk is full, what is wasting space in their projects, which files their projects or AI tools left behind, what's on their cutting room floor, asks to run Cutting Room Floor, or asks to update or check for updates to Cutting Room Floor.
 ---
 
 # Cutting Room Floor
@@ -36,7 +36,7 @@ If there is already a saved list and they did not ask to change it, skip this st
 
 Run `PYTHON SCRIPT` **in the background** (it is a server and keeps running). It prints the address, usually `http://127.0.0.1:8765` (it picks the next free port if that one is taken), and opens the page in their browser. Give them the address in case the browser did not open.
 
-The person can also pick folders in the page itself: if no folders are saved, the page opens on a folder picker, and the header has a "Change folders" button.
+The person can also pick folders in the page itself: if no folders are saved, the page opens on a folder picker (with a button that opens their system's own folder window), and the header has a "Settings" button for changing folders and checking for updates.
 
 ## 4. Help with the results
 
@@ -52,7 +52,21 @@ Give a short summary in plain words: how much is in "Safe to remove" (build fold
 
 Remind them once that they use it at their own risk: check before removing, and back up anything important. Then leave the choosing to them in the page. Never call the page's remove endpoints yourself, and never delete files with shell commands on the person's behalf as part of this skill.
 
-## 5. Stopping
+## 5. Updates
+
+If the person asks to update Cutting Room Floor, or whether there's a newer version:
+
+1. Run `PYTHON SCRIPT --check-update`. It asks GitHub for the latest version number and prints JSON with `current`, `latest`, `newer`, `notes` and `install`. Nothing about their files is sent. If it has an `error`, pass it on in plain words.
+2. If `newer` is false, tell them they have the latest version.
+3. If `newer` is true, tell them the new version number and summarise `notes`, then ask if they want it. Never update without a yes.
+   - `install` is `claude`: on a yes, run `claude plugin marketplace update creativemash` and then `claude plugin update cutting-room-floor@creativemash`. Then tell them to type `/reload-plugins` (or restart Claude Code) and ask again to run it. If the commands fail, tell them to type `/plugin`, open **Installed**, pick **cutting-room-floor** and choose **Update now**.
+   - `install` is `git`: on a yes, run `git -C "FOLDER" pull` with the `folder` from the JSON.
+   - `install` is `zip`: tell them to download the new version from the `repo` page and put it in place of the old folder. Their saved folders are kept.
+4. Mention once that they can get updates without asking: type `/plugin`, open **Marketplaces**, pick **creativemash** and turn on auto-update.
+
+Stop a running server before updating, and start it again afterwards.
+
+## 6. Stopping
 
 The server stops when the person presses Ctrl+C in its window, or when you stop the background command. Stop it when they say they are done.
 
@@ -63,5 +77,6 @@ The server stops when the person presses Ctrl+C in its window, or when you stop 
 - `--no-caches` skips app and download caches.
 - `--no-browser` does not open the browser.
 - `--port N` picks the starting port.
+- `--check-update` asks GitHub whether a newer version exists, then exits.
 
 Saved settings live in `~/.config/cutting-room-floor/config.json` (macOS and Linux) or `%APPDATA%\Cutting Room Floor\config.json` (Windows).

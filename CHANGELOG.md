@@ -1,0 +1,13 @@
+# Changes
+
+Each release is listed here, newest first. The Settings page shows the notes for a new version when you check for updates, so keep each entry short and in plain words.
+
+## 1.0.0
+
+First release.
+
+- Finds build folders, backups, copies, duplicates, unused media and caches across your project folders.
+- Asks which folders to look at on first use, with suggestions from your Claude Code projects.
+- Choose folders with your computer's own folder window, or paste a location.
+- Settings page with your folders and a check for updates.
+- Works on macOS, Windows and Linux. Everything removed goes to the Trash or Recycle Bin first.

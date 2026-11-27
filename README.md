@@ -11,7 +11,7 @@ Making things with AI is fast, and it leaves a lot on the cutting room floor: te
 Cutting Room Floor finds it across all your project folders, explains each item in plain words, and lets you tick what to sweep up, in one page.
 
 - **Nothing is removed by the scan.** You choose in the page, confirm, and items go to the Trash (the Recycle Bin on Windows), so you can put them back.
-- **Nothing leaves your computer.** The page runs on your own machine at `127.0.0.1`, which no other device can reach.
+- **Nothing about your files leaves your computer.** The page runs on your own machine at `127.0.0.1`, which no other device can reach. The only things it fetches from the internet are its fonts (from Google Fonts) and, when you check for updates, the latest version number (from GitHub).
 - **Nothing to install** beyond Python 3.8 or newer.
 
 > **Use at your own risk.** Cutting Room Floor suggests what you might remove; you decide, and you're responsible for what you remove. Check every item first and back up anything important. Once the Trash is emptied, files may be gone for good. Read the [disclaimer](#disclaimer) before you start.
@@ -32,13 +32,9 @@ Then ask Claude something like *"what's on my cutting room floor?"* or *"what's 
 
 ### Getting updates
 
-Updates don't install themselves unless you switch that on. To turn on automatic updates, run `/plugin` in Claude Code, open the **Marketplaces** tab, choose **creativemash** and turn on auto-update. To update by hand, run:
+Updates don't install themselves unless you switch that on. To check, open **Settings** in the page and press **Check for updates**, or just ask Claude to *"update Cutting Room Floor"*.
 
-```
-/plugin marketplace update creativemash
-```
-
-then `/reload-plugins` (or restart Claude Code). Your saved folders are kept between updates.
+To update by hand, type `/plugin` in Claude Code, open **Installed**, pick **cutting-room-floor** and choose **Update now**, then type `/reload-plugins`. To get updates automatically, type `/plugin`, open **Marketplaces**, pick **creativemash** and turn on auto-update. Your saved folders are kept between updates.
 
 ## Use it without Claude
 
@@ -56,7 +52,9 @@ python3 skills/cutting-room-floor/cutting_room_floor.py
 py -3 skills\cutting-room-floor\cutting_room_floor.py
 ```
 
-Your browser opens on a folder picker. Tick your project folders, press **Start the scan**, and the results appear when it's done. Next time it goes straight to the scan. Use **Change folders** in the header to pick again. To update, download the ZIP again and replace the old folder; your saved folders are kept.
+Your browser opens on a folder picker. Tick your project folders, or press **Choose a folder…** to pick one in Finder or Explorer, then press **Start the scan**. The results appear when it's done. Next time it goes straight to the scan. Open **Settings** in the header to change your folders or check for updates.
+
+To update, download the ZIP again and replace the old folder (if you cloned it with Git, run `git pull` instead). Your saved folders are kept.
 
 ## What it looks for
 
@@ -87,6 +85,8 @@ Claude Code session copies (`.claude/worktrees`) are shown separately and can't 
 --suggest            print suggested folders as JSON
 --set-roots F ...    save folders without opening the page
 --show-config        print your saved settings
+--check-update       ask GitHub whether a newer version exists
+--version            print the version
 ```
 
 Saved folders live in `~/.config/cutting-room-floor/config.json` on macOS and Linux, and `%APPDATA%\Cutting Room Floor\config.json` on Windows.
