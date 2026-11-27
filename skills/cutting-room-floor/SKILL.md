@@ -1,6 +1,6 @@
 ---
 name: cutting-room-floor
-description: Sweep up the clutter that builds up in the person's project folders when they and their AI tools make things. Finds what is taking up disk space (rebuildable build folders like node_modules, backups and copies, media no project uses, duplicate files, app caches) and open a page where they choose what to move to the Trash or Recycle Bin. Use when someone asks why their disk is full, what is wasting space in their projects, which files their projects or AI tools left behind, what's on their cutting room floor, asks to run Cutting Room Floor, or asks to update or check for updates to Cutting Room Floor.
+description: Find and sweep up the clutter in the person's project folders: rebuildable build folders like node_modules, backups and copies, old renders and exports no project uses, duplicate files and app caches. Opens a local page where they choose what to move to the Trash or Recycle Bin. Use when someone wants to free up disk space or storage on their computer, says their Mac, PC or laptop is running out of space or their disk is full, asks how much space their projects use, what they can delete, to find big files they don't need, or to clean up or tidy leftovers in their projects or from AI tools such as Claude. Also when they ask what's on their cutting room floor, to run Cutting Room Floor, or to update it. Not for phones, cloud storage, or making a single file smaller.
 ---
 
 # Cutting Room Floor

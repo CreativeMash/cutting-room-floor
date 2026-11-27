@@ -2,6 +2,10 @@
 
 Each release is listed here, newest first. The Settings page shows the notes for a new version when you check for updates, so keep each entry short and in plain words.
 
+## 1.0.1
+
+- Claude now recognises everyday requests like "my Mac is running out of space" or "what can I delete?".
+
 ## 1.0.0
 
 First release.
