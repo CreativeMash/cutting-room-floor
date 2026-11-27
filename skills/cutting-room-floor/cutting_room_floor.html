@@ -119,6 +119,20 @@
   .pjrow span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 500; }
   .pjrow small { display: block; font: 400 11.5px var(--mono); color: var(--muted); }
   .pjrow em { font: 400 12px var(--mono); font-style: normal; color: var(--muted); }
+  .tygrp + .tygrp { border-top: 1px solid var(--hair); margin-top: 4px; padding-top: 4px; }
+  .tyrow { grid-template-columns: 18px 1fr auto 28px; }
+  .tyopen { width: 28px; height: 28px; display: grid; place-items: center; border: 0; border-radius: 8px; background: none; color: var(--muted); cursor: pointer; }
+  .tyopen:hover { background: var(--paper); color: var(--ink); } .tyopen svg { width: 12px; height: 12px; transition: transform .15s ease; transform: rotate(-90deg); }
+  .tygrp.open .tyopen svg { transform: none; }
+  .tysub { display: none; padding-left: 28px; } .tygrp.open .tysub { display: block; }
+  .tysub .pjrow { padding: 7px 10px; } .tysub .pjrow span { font: 500 13px var(--mono); }
+  .tyrow .tyopen.none { visibility: hidden; }
+  .stick { position: sticky; top: 76px; z-index: 4; background: var(--paper); padding-top: 12px; border-bottom: 1px solid var(--rule); }
+  .stick + table { border-top: 0; }
+  .morep { margin-top: 14px; border: 0; background: none; padding: 6px 0; font: 500 14px var(--sans); color: var(--ink); cursor: pointer; text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 4px; }
+  .morep:hover { text-decoration-color: currentColor; }
+  tr.more td { padding: 22px 0 6px; text-align: center; border-bottom: 0; }
+  tr.more span { display: block; margin-top: 10px; font: 400 12.5px var(--mono); color: var(--muted); }
   .chip { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border: 0; border-radius: 999px; background: var(--ink); color: var(--paper); font-size: 14px; font-weight: 500; cursor: pointer; }
 
   table { width: 100%; border-collapse: collapse; border-top: 1px solid var(--rule); }
@@ -133,6 +147,7 @@
   .tag { display: inline-flex; align-items: center; gap: 7px; font: 400 11.5px var(--mono); padding: 4px 10px 4px 8px; border-radius: 999px; background: var(--bg); color: var(--ink); letter-spacing: 0; }
   .tag .dot { width: 8px; height: 8px; }
   .pth { font: 400 12.5px/1.5 var(--mono); color: var(--muted); word-break: break-all; margin-top: 4px; }
+  .no-notes #list .desc, .no-paths #list .pth, .no-thumbs #list .th { display: none; }
   .note { color: var(--muted); font-size: 15px; line-height: 1.45; margin-top: 8px; max-width: 60ch; }
   td.sz { width: 140px; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; font-size: 18px; font-weight: 500; letter-spacing: -.02em; }
   .mini { height: 4px; border-radius: 999px; background: var(--ink); margin-top: 10px; margin-left: auto; }
@@ -209,7 +224,7 @@
   .warn { display: flex; gap: 10px; align-items: center; margin: 16px 0 0; padding: 12px 16px; border-radius: 14px; background: #fff3d1; color: var(--ink); font-weight: 500; }
   dialog ul { max-height: 220px; overflow: auto; margin: 20px 0 0; padding: 14px 18px; list-style: none; background: var(--bg); border-radius: 14px; font: 400 12.5px/1.7 var(--mono); color: var(--muted); }
   .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 26px; }
-  .toast { position: fixed; top: 88px; left: 50%; transform: translateX(-50%); display: none; align-items: center; gap: 10px; padding: 11px 18px 11px 14px; border-radius: 999px; background: var(--ink); color: var(--paper); font-size: 14px; font-weight: 500; z-index: 9; box-shadow: 0 0 0 1px rgba(250,249,245,.28), 0 6px 18px rgba(0,0,0,.18); }
+  .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); display: none; align-items: center; gap: 10px; padding: 11px 18px 11px 14px; border-radius: 999px; background: var(--ink); color: var(--paper); font-size: 14px; font-weight: 500; z-index: 9; box-shadow: 0 0 0 1px rgba(250,249,245,.28), 0 6px 18px rgba(0,0,0,.18); }
   main.wrap { padding-bottom: 72px; }
   body:has(#foot:not([hidden])) main.wrap { padding-bottom: 152px; }  /* room above the fixed bar */
 
@@ -258,6 +273,7 @@
   .updbar { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin: 0 0 18px; padding: 10px 10px 10px 18px; border-radius: 999px; background: var(--bg); font-weight: 500; width: fit-content; }
   .intro { padding: clamp(20px, 3vw, 44px) 0 clamp(28px, 3vw, 44px); }
   .intro h1 { max-width: 16ch; }
+  .intro.slim { padding: clamp(18px, 2vw, 28px) 0 4px; }  /* results page: only the scan time above the numbers */
   /* the Creative Mash shapes: random on each visit, new ones on every click */
   .intro.hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: clamp(32px, 5vw, 80px); align-items: center; }
   .orns { --cell: clamp(40px, 4.2vw, 62px); display: grid; grid-template-columns: repeat(4, var(--cell)); grid-auto-rows: var(--cell); gap: 8px; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 12px; }
@@ -276,6 +292,7 @@
   .credit a { color: var(--ink); text-underline-offset: 3px; }
   a.home { display: block; color: inherit; }
   @media (max-width: 900px) {
+    .stick { position: static; padding-top: 0; }
     .intro.hero, .loading.scan { display: block; } .orns { display: none; }
     .updbar { display: grid; grid-template-columns: auto 1fr; gap: 10px 12px; border-radius: 18px; padding: 14px 16px; width: auto; } .updbar .dot { margin-top: 7px; } .updbar button { grid-column: 2; justify-self: start; }
     .crumb { display: none; } header.top .wrap { gap: 8px; }
@@ -527,9 +544,11 @@ async function openPreview(id) {
   const big = await pic(id, "l");
   if (dlg.open && dlg.dataset.id === id && big) { img.src = big; img.classList.remove("soft"); }
 }
-let D = null, view = { kind: "all", hide: new Set(), q: "" };
+let D = null, view = { kind: "all", hide: new Set(), hideT: new Set(), q: "" }, allProj = false;
+const TOP_PROJ = 5, FIRST_ROWS = 50, MORE_ROWS = 30;
+let shown = FIRST_ROWS, shownFor = "";
 let OS = { computer: "computer", reveal: "Show in folder", bin: "Trash" }, HOME_DIR = "", SEP = "/";
-let APP = { version: "", install: "zip", can_pick: false, check_updates: false }, UPD = null, autoChecked = false;
+let APP = { version: "", install: "zip", can_pick: false, check_updates: false, show_notes: true, show_thumbs: true, show_paths: true }, UPD = null, autoChecked = false;
 const sel = new Set(), gone = new Set();
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -568,6 +587,7 @@ async function poll() {
   const s = await get("/state");
   OS = s.os; HOME_DIR = s.home; SEP = s.sep;
   APP = { version: s.version, install: s.install, can_pick: s.can_pick, check_updates: s.check_updates };
+  LIST_OPTS.forEach(([k]) => APP[k] = s[k] !== false); listLook();
   $("#trashBtn").textContent = $("#dlgOk").textContent = `Move to ${OS.bin}`;
   if (s.status !== "scanning" && s.status !== "starting") $("#scanbar").hidden = true;
   if (s.status === "setup") { openSetup(); return; }
@@ -613,6 +633,12 @@ async function openSetup(settings) {
     <div class="intro"><h1>Settings</h1></div>
     <section class="block settings"><h2>Your folders</h2>
       <p class="lead-sm">Only ticked folders are looked at. Use × to take a folder off this list. Changes are saved when you scan again.</p>${folders}</section>
+    <section class="block settings">
+      <h2>The list</h2>
+      <p class="lead-sm">Turn these off for a shorter list. Each item always shows its name, label and size, and hovering over the name shows its folder and description.</p>
+      ${LIST_OPTS.map(([k, , b, t]) => `<label class="opt"><input type="checkbox" data-pref="${k}" ${APP[k] ? "checked" : ""}>
+        <span><b>${b}</b> ${t}</span></label>`).join("")}
+    </section>
     <section class="block settings" id="updates">
       <h2>Updates</h2>
       <p class="ver">You have version <b>${esc(APP.version)}</b>.</p>
@@ -673,7 +699,7 @@ async function openSetup(settings) {
     const res = await post("/setup", { roots, caches: $("#useCaches").checked, hide: [...hide], listed });
     $("#startScan").disabled = false;
     if (res.error) { $("#setupErr").textContent = res.error; return; }
-    sel.clear(); gone.clear(); view = { kind: "all", hide: new Set(), q: "" };
+    sel.clear(); gone.clear(); view = { kind: "all", hide: new Set(), hideT: new Set(), q: "" };
     scanning(); setTimeout(poll, 400);
   };
   if (!settings) return;
@@ -684,6 +710,7 @@ async function openSetup(settings) {
     $("#updOut").innerHTML = updBox(UPD); wireCopy();
   };
   $("#autoUpd").onchange = e => { APP.check_updates = e.target.checked; post("/prefs", { check_updates: e.target.checked }); };
+  document.querySelectorAll("[data-pref]").forEach(c => c.onchange = () => { APP[c.dataset.pref] = c.checked; listLook(); post("/prefs", { [c.dataset.pref]: c.checked }); });
   wireCopy();
   if (settings === "updates") $("#updates").scrollIntoView({ block: "start" });
 }
@@ -835,12 +862,10 @@ function render() {
   const pl = projList(), only = onlyProject(pl);
 
   $("#app").innerHTML = `
-    <div class="intro hero"><div>
+    <div class="intro slim">
       ${UPD && UPD.newer ? `<p class="updbar">${dot("--g-pink")}Version ${esc(UPD.latest)} of Cutting Room Floor is available<button class="pill ring sm" id="seeUpd">See how to update</button></p>` : ""}
       <p class="eyebrow">Scanned ${esc(D.scanned_at)}</p>
-      <h1>What’s on your cutting room floor?</h1>
-      <p class="lead">Leftover renders, test runs, copies and build files in ${D.roots.map(r => `<code>${esc(tilde(r))}</code>`).join(", ")}${D.caches ? " and your app caches" : ""}. Nothing is removed until you choose it, and anything you remove goes to the ${esc(OS.bin)} first.</p>
-    </div>${orns()}</div>
+    </div>
 
     <div class="facts">
       <div><b>${fmt(D.disk.free)}</b><span>free of ${fmt(D.disk.total)} on this disk</span></div>
@@ -864,23 +889,25 @@ function render() {
         <div class="legend">${SEG.map(([, l, c]) => `<span>${dot(c)}${l}</span>`).join("")}</div>
       </div>
       <div class="chart">
-      ${projs.slice(0, 24).map(([nm, c, tot]) => `
+      ${projs.slice(0, allProj ? projs.length : TOP_PROJ).map(([nm, c, tot]) => `
         <button class="proj ${only === nm ? "on" : ""}" data-p="${esc(nm)}" aria-pressed="${only === nm}" title="Show only this project">
           <span class="pn">${esc(nm.split(" / ")[1])}<small>${esc(nm.split(" / ")[0])}</small></span>
           <span class="bar" style="width:${Math.max(1, tot / maxP * 100)}%">${SEG.map(([k, l, col]) => c[k] ? `<div style="flex:${c[k]};background:var(${col})" title="${esc(l)}: ${fmt(c[k])}"></div>` : "").join("")}</span>
           <span class="num">${fmt(tot)}</span>
         </button>`).join("")}
       </div>
+      ${projs.length > TOP_PROJ ? `<button class="morep" id="allProj" aria-expanded="${allProj}">${allProj ? `Show the top ${TOP_PROJ}` : `Show all ${projs.length} projects`}</button>` : ""}
     </section>
 
     <section class="block">
       <p class="eyebrow">Review and remove</p>
       <div class="head"><h2>Choose what to keep</h2></div>
-      <div class="tabs" role="tablist">${KINDS.map(([k, l, c]) => `<button class="tab ${view.kind === k ? "on" : ""}" role="tab" aria-selected="${view.kind === k}" data-k="${k}">${c ? dot(c) : ""}${l}<em>${counts[k]}</em></button>`).join("")}</div>
+      <div class="stick"><div class="tabs" role="tablist">${KINDS.map(([k, l, c]) => `<button class="tab ${view.kind === k ? "on" : ""}" role="tab" aria-selected="${view.kind === k}" data-k="${k}">${c ? dot(c) : ""}${l}<em>${counts[k]}</em></button>`).join("")}</div>
       <div class="tools">
         <input type="search" id="q" aria-label="Filter by name or path" placeholder="Filter by name or path" value="${esc(view.q)}">
         ${pl.length > 1 ? projPicker(pl) : ""}
-      </div>
+        ${typeGroups().length ? typePicker() : ""}
+      </div></div>
       <table id="list"></table>
     </section>
     ${credit()}`;
@@ -892,7 +919,8 @@ function render() {
   });
   document.querySelectorAll(".tab").forEach(el => el.onclick = () => { view.kind = el.dataset.k; render(); });
   $("#q").oninput = e => { view.q = e.target.value; renderList(); };
-  wirePicker();
+  wirePicker(); wireTypes();
+  if ($("#allProj")) $("#allProj").onclick = () => { allProj = !allProj; render(); };
   $("#rescan").hidden = false;
   $("#settings").hidden = false;
   $("#settings").textContent = "Settings";
@@ -933,7 +961,7 @@ function projPicker(pl) {
 }
 function wirePicker() {
   const btn = $("#pjBtn"), menu = $("#pjMenu"); if (!btn) return;
-  const show = open => { menu.hidden = !open; btn.setAttribute("aria-expanded", open); };
+  const show = open => { if (open) closeMenus(); menu.hidden = !open; btn.setAttribute("aria-expanded", open); };
   const sync = () => {   // the button, the chart and the list follow the ticks
     const pl = projList(), only = onlyProject(pl);
     btn.innerHTML = projLabel(pl) + ICON_DOWN; btn.classList.toggle("on", view.hide.size > 0);
@@ -949,11 +977,106 @@ function wirePicker() {
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !menu.hidden) { show(false); btn.focus(); } }, { signal: wirePicker.ac.signal });
 }
 
+// the Settings options for what each row shows: [setting, body class when off, label, explanation]
+const LIST_OPTS = [
+  ["show_thumbs", "no-thumbs", "Show thumbnails.", "The small picture beside images, videos and frame folders."],
+  ["show_paths", "no-paths", "Show where each item is.", "The folder path under each name."],
+  ["show_notes", "no-notes", "Show a description under each item.", "What the item is and whether it’s safe to remove."],
+];
+const listLook = () => LIST_OPTS.forEach(([k, cls]) => document.body.classList.toggle(cls, !APP[k]));
+const closeMenus = () => document.querySelectorAll(".pjmenu").forEach(m => { m.hidden = true; document.querySelector(`[aria-controls="${m.id}"]`)?.setAttribute("aria-expanded", false); });
+
+// file types: a group (Images, Video…) and a sub-type (the extension, or "Frame folders")
+const TYPE_GROUPS = [   // checked in order: the first group whose list has the extension wins
+  ["image", "Images", /^(png|jpe?g|gif|webp|tiff?|tga|heic|heif|exr|dpx|bmp|svg|raw|cr2|cr3|nef|arw|dng|avif)$/],
+  ["video", "Video", /^(mov|mp4|m4v|mkv|webm|avi|mxf|prores|r3d|braw|mts|wmv)$/],
+  ["audio", "Audio", /^(wav|mp3|aiff?|m4a|flac|aac|ogg|opus)$/],
+  ["design", "Design files", /^(psd|psb|ai|indd|idml|sketch|fig|xd|afdesign|afphoto|afpub|eps|xcf|kra|procreate)$/],
+  ["3d", "3D files", /^(blend\d*|fbx|obj|c4d|usdz?|usd[ac]|glb|gltf|abc|ma|mb|max|stl|3ds|hip|ztl)$/],
+  ["edit", "Edit and audio projects", /^(prproj|aep|aet|fcpxml|fcpbundle|drp|veg|aup3?|als|logicx|ptx|band|rpp)$/],
+  ["doc", "Documents", /^(pdf|docx?|pages|odt|rtf|txt|md|markdown|tex|epub)$/],
+  ["sheet", "Spreadsheets", /^(xlsx?|numbers|ods|csv|tsv)$/],
+  ["slides", "Presentations", /^(pptx?|key|odp)$/],
+  ["archive", "Archives", /^(zip|rar|7z|tar|gz|tgz|bz2|xz|dmg|iso|pkg)$/],
+  ["code", "Code and data", /^(json|js|mjs|ts|tsx|jsx|py|rb|go|rs|java|swift|c|cpp|h|cs|php|html?|css|scss|sql|sqlite3?|db|log|xml|ya?ml|sh|ipynb|parquet)$/],
+  ["font", "Fonts", /^(ttf|otf|woff2?)$/],
+];
+const GROUP_NAME = { ...Object.fromEntries(TYPE_GROUPS.map(([k, l]) => [k, l])), folder: "Folders", other: "Other files" };
+function typeOf(i) {
+  if (i.is_dir || i.dir) return i.kind === "media" ? { g: "image", key: "image:frames", label: "Frame folders" } : { g: "folder", key: "folder", label: "Folders" };
+  const m = /\.([^.]+)$/.exec(i.name), ext = m ? m[1].toLowerCase() : "";
+  const g = (TYPE_GROUPS.find(([, , re]) => re.test(ext)) || ["other"])[0];
+  return { g, key: `${g}:${ext}`, label: ext ? ext.toUpperCase() : "No extension" };
+}
+// what the scan found, biggest group first; each group lists its sub-types
+function typeGroups() {
+  const gs = new Map();
+  D.items.forEach(i => { if (i.risk === "keep" || gone.has(i.id)) return;
+    const t = typeOf(i), g = gs.get(t.g) || { g: t.g, name: GROUP_NAME[t.g], n: 0, size: 0, subs: new Map() };
+    const sub = g.subs.get(t.key) || { key: t.key, label: t.label, n: 0, size: 0 };
+    sub.n++; sub.size += i.size; g.n++; g.size += i.size; g.subs.set(t.key, sub); gs.set(t.g, g); });
+  return [...gs.values()].map(g => ({ ...g, subs: [...g.subs.values()].sort((a, b) => b.size - a.size) })).sort((a, b) => b.size - a.size);
+}
+function typeLabel(gs) {
+  const subs = gs.flatMap(g => g.subs), on = subs.filter(t => !view.hideT.has(t.key));
+  if (on.length === subs.length) return `All file types <em>${gs.length}</em>`;
+  const full = gs.filter(g => g.subs.every(t => !view.hideT.has(t.key)));
+  if (full.length === 1 && on.length === full[0].subs.length) return esc(full[0].name);
+  if (on.length === 1) return esc(on[0].label);
+  return `${on.length} of ${subs.length} types`;
+}
+const n_ = (n, w) => `${n} ${w}${n > 1 ? "s" : ""}`;
+function typePicker() {
+  const gs = typeGroups();
+  return `<div class="pj"><button class="pjbtn ${view.hideT.size ? "on" : ""}" id="tyBtn" aria-haspopup="true" aria-expanded="false" aria-controls="tyMenu">${typeLabel(gs)}${ICON_DOWN}</button>
+    <div class="pjmenu" id="tyMenu" hidden role="group" aria-label="File types to show">
+      <div class="pjall"><button data-ty="all">Show all</button><button data-ty="none">Clear all</button></div>
+      <div class="pjlist">${gs.map(g => `
+        <div class="tygrp" data-g="${g.g}">
+          <label class="pjrow tyrow"><input type="checkbox" data-grp="${g.g}">
+            <span>${esc(g.name)}<small>${n_(g.n, "item")}${g.subs.length > 1 ? ` · ${n_(g.subs.length, "type")}` : ""}</small></span><em>${fmt(g.size)}</em>
+            <button class="tyopen ${g.subs.length > 1 ? "" : "none"}" type="button" aria-label="Show the types of ${esc(g.name)}" aria-expanded="false">${ICON_DOWN}</button></label>
+          <div class="tysub">${g.subs.map(t => `
+            <label class="pjrow"><input type="checkbox" value="${esc(t.key)}"><span>${esc(t.label)}<small>${n_(t.n, "item")}</small></span><em>${fmt(t.size)}</em></label>`).join("")}</div>
+        </div>`).join("")}</div>
+    </div></div>`;
+}
+function wireTypes() {
+  const btn = $("#tyBtn"), menu = $("#tyMenu"); if (!btn) return;
+  const show = open => { if (open) closeMenus(); menu.hidden = !open; btn.setAttribute("aria-expanded", open); };
+  const sync = () => {
+    const gs = typeGroups();
+    btn.innerHTML = typeLabel(gs) + ICON_DOWN; btn.classList.toggle("on", view.hideT.size > 0);
+    menu.querySelectorAll(".tysub input").forEach(c => c.checked = !view.hideT.has(c.value));
+    gs.forEach(g => { const c = menu.querySelector(`[data-grp="${g.g}"]`); if (!c) return;
+      const on = g.subs.filter(t => !view.hideT.has(t.key)).length;
+      c.checked = on === g.subs.length; c.indeterminate = on > 0 && on < g.subs.length; });
+    renderList();
+  };
+  btn.onclick = e => { e.stopPropagation(); show(menu.hidden); };
+  menu.onclick = e => {
+    e.stopPropagation();
+    const o = e.target.closest(".tyopen"); if (!o) return;
+    e.preventDefault();   // the chevron opens the group; it doesn't tick it
+    const g = o.closest(".tygrp"); g.classList.toggle("open"); o.setAttribute("aria-expanded", g.classList.contains("open"));
+  };
+  menu.onchange = e => {
+    const c = e.target; if (c.type !== "checkbox") return;
+    const keys = c.dataset.grp ? [...menu.querySelectorAll(`.tygrp[data-g="${c.dataset.grp}"] .tysub input`)].map(x => x.value) : [c.value];
+    keys.forEach(k => c.checked ? view.hideT.delete(k) : view.hideT.add(k)); sync();
+  };
+  menu.querySelectorAll("[data-ty]").forEach(b => b.onclick = () => { view.hideT = b.dataset.ty === "all" ? new Set() : new Set(typeGroups().flatMap(g => g.subs.map(t => t.key))); sync(); });
+  wireTypes.ac?.abort(); wireTypes.ac = new AbortController();
+  document.addEventListener("click", () => show(false), { signal: wireTypes.ac.signal });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !menu.hidden) { show(false); btn.focus(); } }, { signal: wireTypes.ac.signal });
+  sync();
+}
+
 function visible() {
   const q = view.q.trim().toLowerCase();
   return D.items.filter(i => i.risk !== "keep" &&
     (view.kind === "all" || kindOf(i) === view.kind) &&
-    !view.hide.has(i.project) &&
+    !view.hide.has(i.project) && !view.hideT.has(typeOf(i).key) &&
     (!q || i.path.toLowerCase().includes(q)));
 }
 
@@ -966,30 +1089,37 @@ function row(i, maxS) {
   const inside = fold && !sel.has(i.id) ? [...KIDS.values()].filter(k => k.parent === i.id && sel.has(k.id)).length : 0;
   return `<tr class="${g ? "gone" : ""}">
     <td class="ck"><input type="checkbox" aria-label="Select ${esc(i.name)}" data-id="${i.id}" ${sel.has(i.id) ? "checked" : ""} ${g || nb ? "disabled" : ""}></td>
-    <td>${pv ? `<div class="itm"><button class="th" data-pv="${i.id}" data-name="${esc(i.name)}" ${i.preview ? "data-pic" : ""} ${fold ? `data-fv="${i.id}"` : ""} aria-label="${fold ? `See the files in` : i.preview ? "Preview" : "Play"} ${esc(i.name)}">${i.preview ? ICON_PIC : ICON_FILM}</button><div>` : ""}<div class="nm">${esc(i.name)}${i.count != null ? (fold ? `<button class="openfv" data-fv="${i.id}">${ICON_GRID}See all ${i.count} files</button>` : `<span class="cnt">${i.count} files</span>`) : ""}${inside ? `<span class="tag inside">${inside} ticked inside</span>` : ""}<span class="tag">${dot(col)}${label}</span>${nb ? `<span class="tag">${dot("--g-orange")}Can’t go to the ${esc(OS.bin)}</span>` : ""}</div>
-      <div class="pth">${esc(tilde(i.path))}</div><div class="note">${esc(i.note)}</div>${nb ? `<div class="note"><b>${esc(i.no_bin)}</b></div>` : ""}${pv ? "</div></div>" : ""}</td>
+    <td>${pv ? `<div class="itm"><button class="th" data-pv="${i.id}" data-name="${esc(i.name)}" ${i.preview ? "data-pic" : ""} ${fold ? `data-fv="${i.id}"` : ""} aria-label="${fold ? `See the files in` : i.preview ? "Preview" : "Play"} ${esc(i.name)}">${i.preview ? ICON_PIC : ICON_FILM}</button><div>` : ""}<div class="nm"><span class="nmt" title="${esc(tilde(i.path) + "\n" + i.note)}">${esc(i.name)}</span>${i.count != null ? (fold ? `<button class="openfv" data-fv="${i.id}">${ICON_GRID}See all ${i.count} files</button>` : `<span class="cnt">${i.count} files</span>`) : ""}${inside ? `<span class="tag inside">${inside} ticked inside</span>` : ""}<span class="tag">${dot(col)}${label}</span>${nb ? `<span class="tag">${dot("--g-orange")}Can’t go to the ${esc(OS.bin)}</span>` : ""}</div>
+      <div class="pth">${esc(tilde(i.path))}</div><div class="note desc">${esc(i.note)}</div>${nb ? `<div class="note"><b>${esc(i.no_bin)}</b></div>` : ""}${pv ? "</div></div>" : ""}</td>
     <td class="sz">${fmt(i.size)}<div class="mini" style="width:${Math.max(4, i.size / maxS * 100)}%"></div></td>
     <td class="act">${g ? `<span class="eyebrow">In the ${esc(OS.bin)}</span>` : `<button class="pill ring sm" data-rev="${i.id}">${esc(OS.reveal)} ${ICON_OUT}</button>`}</td></tr>`;
 }
 
 function renderList() {
   const items = visible();
+  const key = JSON.stringify([view.kind, [...view.hide], [...view.hideT], view.q.trim()]);
+  if (key !== shownFor) { shown = FIRST_ROWS; shownFor = key; }
   const maxS = Math.max(1, ...items.map(i => i.size));
-  let html = "";
+  // blocks of rows: one per item, or a whole group of identical copies, which is never split
+  let blocks;
   if (view.kind === "duplicate") {
     const groups = {};
     items.forEach(i => (groups[i.group] = groups[i.group] || []).push(i));
-    Object.values(groups).sort((a, b) => b[0].size * b.length - a[0].size * a.length).forEach(gr => {
-      html += `<tr class="grp"><td colspan="4">${gr[0].copies} identical copies · ${fmt(gr[0].size)} each</td></tr>` + gr.map(i => row(i, maxS)).join("");
-    });
+    blocks = Object.values(groups).sort((a, b) => b[0].size * b.length - a[0].size * a.length)
+      .map(gr => ({ n: gr.length, html: `<tr class="grp"><td colspan="4">${gr[0].copies} identical copies · ${fmt(gr[0].size)} each</td></tr>` + gr.map(i => row(i, maxS)).join("") }));
   } else {
-    html = items.sort((a, b) => b.size - a.size).map(i => row(i, maxS)).join("");
+    blocks = items.sort((a, b) => b.size - a.size).map(i => ({ n: 1, html: row(i, maxS) }));
   }
-  $("#list").innerHTML = html || `<tr><td class="empty">Nothing here${view.hide.size || view.q ? " with the current filter" : ""}.</td></tr>`;
+  let html = "", rows = 0;
+  for (const b of blocks) { if (rows >= shown) break; html += b.html; rows += b.n; }
+  const left = items.length - rows;
+  if (left > 0) html += `<tr class="more"><td colspan="4"><button class="pill ring" id="moreRows">Show ${Math.min(MORE_ROWS, left)} more</button><span>Showing ${rows} of ${items.length}, biggest first</span></td></tr>`;
+  $("#list").innerHTML = html || `<tr><td class="empty">Nothing here${view.hide.size || view.hideT.size || view.q ? " with the current filter" : ""}.</td></tr>`;
   $("#list").querySelectorAll("input[type=checkbox]").forEach(cb => cb.onchange = () => { cb.checked ? sel.add(cb.dataset.id) : sel.delete(cb.dataset.id); updateFoot(); });
   $("#list").querySelectorAll("[data-rev]").forEach(b => b.onclick = () => post("/reveal", { id: b.dataset.rev }));
   $("#list").querySelectorAll("[data-pv]").forEach(b => { b.onclick = () => b.dataset.fv ? openFolder(b.dataset.fv) : openPreview(b.dataset.pv); if (b.hasAttribute("data-pic")) thumbs.observe(b); });
   $("#list").querySelectorAll(".openfv").forEach(b => b.onclick = () => openFolder(b.dataset.fv));
+  if ($("#moreRows")) $("#moreRows").onclick = () => { shown += MORE_ROWS; renderList(); };
   updateFoot();
 }
 
@@ -1008,7 +1138,12 @@ function updateFoot() {
 }
 function toast(msg) { const t = $("#toast"); t.innerHTML = dot("--g-green") + esc(msg); t.style.display = "inline-flex"; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = "none", 4500); }
 
-$("#selSafe").onclick = () => { visible().filter(i => i.risk === "safe" && !gone.has(i.id) && !i.no_bin).forEach(i => sel.add(i.id)); renderList(); };
+$("#selSafe").onclick = () => {
+  const safe = visible().filter(i => i.risk === "safe" && !gone.has(i.id) && !i.no_bin);
+  safe.forEach(i => sel.add(i.id)); renderList();
+  const off = safe.filter(i => !$("#list").querySelector(`[data-id="${i.id}"]`)).length;
+  if (off) toast(`${safe.length} safe items ticked, ${off} of them further down the list.`);
+};
 $("#clear").onclick = () => { sel.clear(); renderList(); };
 $("#trashBtn").onclick = () => {
   const s = selection();

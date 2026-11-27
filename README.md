@@ -92,7 +92,9 @@ Claude Code session copies (`.claude/worktrees`) are shown separately and can't 
 
 **See before you choose.** Images and videos have a thumbnail in the list. Click it for a bigger view, or press play to watch a video in the page. A folder of frames shows its first frame; press **See all files** to open it, see every frame, and tick only the ones you want to remove. On a Mac, most image types (including PSD, TIFF, HEIC and EXR) and MP4 and MOV videos get thumbnails; on Windows and Linux, PNG, JPG and WebP do. Videos your browser can't play, such as ProRes in Chrome, open in your usual video player instead.
 
-**Narrow it down.** The project menu next to the search box lists every project with its size. Untick the ones you don't want to see; click a project in the chart to show only that one.
+**Narrow it down.** The project menu next to the search box lists every project with its size; untick the ones you don't want to see, or click a project in the chart to show only that one. The file type menu groups what was found (documents, images, video, design files, 3D, archives and more), and each group opens to show its file types, such as MOV or PDF. The list shows the biggest 50 items first, with Show more for the rest, and the filters stay at the top as you scroll.
+
+**A shorter list.** In Settings, under The list, you can turn off thumbnails, folder paths and descriptions. Hovering over a name still shows its folder and description.
 
 ![Previewing a video before choosing](screenshots/05-preview.png)
 

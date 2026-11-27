@@ -100,6 +100,7 @@ BINARY_PROJECT_EXT = {".blend", ".aep", ".psb", ".indd", ".mogrt"}  # path strin
 BIG_MEDIA_BYTES = 25 * 1024**2
 SEQ_MIN_FILES = 20
 DUP_MIN_BYTES = 10 * 1024**2
+LIST_PREFS = ("show_notes", "show_thumbs", "show_paths")   # what each row of the list shows; all on unless turned off
 CACHE_MIN_BYTES = 50 * 1024**2
 TEXT_MAX_BYTES = 4 * 1024**2
 BINARY_MAX_BYTES = 600 * 1024**2
@@ -443,6 +444,8 @@ class Scanner:
         self.n += 1
         item = dict(id=f"i{self.n}", kind=kind, path=str(path), name=path.name, size=size,
                     project=project, risk=risk, note=note, **extra)
+        if path.is_dir():
+            item["dir"] = True   # lets the page sort folders from files in its type menu
         self.items.append(item)
         return item
 
@@ -1392,7 +1395,8 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/state":
             out = {k: STATE[k] for k in ("status", "progress", "data", "error")}
             out.update(os=OS_INFO, home=str(HOME), sep=os.sep, version=app_version(), install=install_type(), can_pick=can_pick(), roots=[str(r) for r in self.server.roots],
-                       check_updates=bool(load_config().get("check_updates", False)))
+                       check_updates=bool(load_config().get("check_updates", False)),
+                       **{k: bool(load_config().get(k, True)) for k in LIST_PREFS})
             return self.send(200, json.dumps(out))
         if path == "/folder":
             got = folder_files(ITEMS.get(parse_qs(self.path.partition("?")[2]).get("id", [""])[0]))
@@ -1484,8 +1488,9 @@ class Handler(BaseHTTPRequestHandler):
             threading.Thread(target=restart, args=(self.server,), daemon=True).start()
             return self.send(200, json.dumps({"ok": True}))
         if path == "/prefs":
-            if "check_updates" in body:
-                save_config(dict(load_config(), check_updates=bool(body["check_updates"])))
+            for k in ("check_updates", *LIST_PREFS):
+                if k in body:
+                    save_config(dict(load_config(), **{k: bool(body[k])}))
             return self.send(200, "{}")
         if path == "/rescan":
             if STATE["status"] != "scanning" and self.server.roots:

@@ -2,6 +2,14 @@
 
 Each release is listed here, newest first. The Settings page shows the notes for a new version when you check for updates, so keep each entry short and in plain words.
 
+## 1.5.0
+
+- A file type menu next to the project menu. It groups what the scan found (Documents, Images, Video, Audio, Design files, 3D, Archives, Code and more), and each group opens to show its file types, such as MOV or PDF. Only types that were found are listed.
+- Settings has a new section, The list, where you can turn off thumbnails, folder paths and descriptions for a shorter list. Hovering over a name still shows its folder and description.
+- The list shows the biggest 50 items first, with a Show more button for the rest. The tabs and filters stay at the top as you scroll.
+- Where the space goes shows your top 5 projects, with a link to show them all.
+- The results page starts with the numbers: the big heading, description and shapes are gone, and the scan date stays.
+
 ## 1.4.2
 
 - The shapes on the scanning screen are the same size as on the results page.
