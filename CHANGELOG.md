@@ -2,6 +2,11 @@
 
 Each release is listed here, newest first. The Settings page shows the notes for a new version when you check for updates, so keep each entry short and in plain words.
 
+## 1.2.1
+
+- While it scans, the progress and the Stop button sit in a bar at the bottom, so the page no longer jumps about with long file names.
+- The shapes show a different number each time, from a few to most of the grid.
+
 ## 1.2.0
 
 - Nothing is scanned until you press Start: the page always opens with your folders ticked so you can check them first.

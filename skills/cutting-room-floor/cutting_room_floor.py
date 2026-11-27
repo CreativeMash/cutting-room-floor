@@ -979,7 +979,7 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path == "/state":
             out = {k: STATE[k] for k in ("status", "progress", "data", "error")}
-            out.update(os=OS_INFO, home=str(HOME), sep=os.sep, version=app_version(), install=install_type(), can_pick=can_pick(),
+            out.update(os=OS_INFO, home=str(HOME), sep=os.sep, version=app_version(), install=install_type(), can_pick=can_pick(), roots=[str(r) for r in self.server.roots],
                        check_updates=bool(load_config().get("check_updates", False)))
             return self.send(200, json.dumps(out))
         if path == "/suggest":

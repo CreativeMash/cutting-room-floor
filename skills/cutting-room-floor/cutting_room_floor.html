@@ -128,12 +128,16 @@
   footer .sel { flex: 1; display: flex; align-items: baseline; gap: 12px; }
   footer .sel b { font-size: 28px; font-weight: 500; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
   footer .sel span { font: 400 13px var(--mono); color: var(--muted); }
+  footer .live { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; }
+  /* One line only. Long paths are cut from the left so the folder being read stays in view. */
+  footer .pg { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: left; font: 400 13px var(--mono); color: var(--muted); }
+  footer .live .dot { flex: none; animation: pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .25; } }
 
   .empty { color: var(--muted); padding: 40px 0; text-align: center; }
   .loading { padding: clamp(80px, 14vw, 200px) 0; }
   .loading.scan { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: clamp(32px, 5vw, 80px); align-items: center; padding: clamp(40px, 7vw, 120px) 0; }
-  .loading.scan .go { margin-top: 28px; }
-  .loading code { font: 400 12.5px var(--mono); color: var(--muted); word-break: break-all; }
+    .loading code { font: 400 12.5px var(--mono); color: var(--muted); word-break: break-all; }
   dialog { border: 0; border-radius: 24px; background: var(--paper); color: var(--ink); max-width: 560px; width: calc(100% - 40px); padding: 32px; box-shadow: 0 0 0 1px rgba(29,30,27,.1), 0 24px 48px -12px rgba(29,30,27,.28); }
   dialog::backdrop { background: rgba(10,10,10,.28); }
   dialog h2 { font-size: 30px; margin-bottom: 12px; }
@@ -221,7 +225,6 @@
 
 <main id="app" class="wrap"><div class="loading">
   <h1>Getting ready</h1>
-  <p id="prog" class="lead">Starting</p>
 </div></main>
 
 <footer class="foot" id="foot" hidden><div class="wrap">
@@ -229,6 +232,11 @@
   <button class="pill ring hide-sm" id="selSafe"><span class="dot" style="background:var(--g-green)"></span>Select all safe</button>
   <button class="pill ghost" id="clear">Clear selection</button>
   <button class="pill solid" id="trashBtn" disabled>Move to Trash</button>
+</div></footer>
+
+<footer class="foot" id="scanbar" hidden><div class="wrap">
+  <div class="live"><span class="dot" style="background:var(--g-green)"></span><span class="pg" dir="rtl"><bdi id="prog" dir="ltr">Starting</bdi></span></div>
+  <button class="pill ring" id="stopScan">Stop</button>
 </div></footer>
 
 <dialog id="dlg" aria-labelledby="dlgTitle">
@@ -277,16 +285,15 @@ async function post(url, body) {
   return r.json();
 }
 let SPIN = null;
-function scanning() {
+function scanning(roots) {
   $("#foot").hidden = true; $("#rescan").hidden = true; $("#settings").hidden = true;
+  const where = roots && roots.length ? ` through ${roots.map(r => `<code>${esc(tilde(r))}</code>`).join(", ")}` : "";
   $("#app").innerHTML = `<div class="loading scan"><div>
-      <h1>Checking the cutting room floor</h1><p id="prog" class="lead"></p>
-      <div class="go"><button class="pill ring" id="stopScan">Stop</button></div>
+      <h1>Checking the cutting room floor</h1>
+      <p class="lead">Looking${where}. Big folders can take a few minutes. You can stop at any time from the bar below.</p>
     </div>${orns()}</div>`;
-  $("#stopScan").onclick = async () => {
-    $("#stopScan").disabled = true; $("#stopScan").textContent = "Stopping…";
-    await post("/stop");
-  };
+  $("#scanbar").hidden = false;
+  $("#stopScan").disabled = false; $("#stopScan").textContent = "Stop";
   // The shapes shuffle by themselves while it works, as a sign it's still going.
   clearInterval(SPIN);
   if (!matchMedia("(prefers-reduced-motion: reduce)").matches) SPIN = setInterval(() => {
@@ -299,11 +306,12 @@ async function poll() {
   OS = s.os; HOME_DIR = s.home; SEP = s.sep;
   APP = { version: s.version, install: s.install, can_pick: s.can_pick, check_updates: s.check_updates };
   $("#trashBtn").textContent = $("#dlgOk").textContent = `Move to ${OS.bin}`;
+  if (s.status !== "scanning" && s.status !== "starting") $("#scanbar").hidden = true;
   if (s.status === "setup") { openSetup(); return; }
   if (s.status === "ready") { D = s.data; render(); autoCheck(); return; }
   if (s.status === "error") { $("#app").innerHTML = `<div class="loading"><h1>The scan stopped</h1><code>${esc(s.error)}</code></div>`; return; }
-  if (!$("#prog") || !$(".loading h1").textContent.startsWith("Checking")) scanning();
-  $("#prog").innerHTML = `<code>${esc(s.progress || "Starting")}</code>`;
+  if (!$(".loading.scan")) scanning(s.roots);
+  $("#prog").textContent = s.progress || "Starting";
   setTimeout(poll, 600);
 }
 
@@ -413,6 +421,10 @@ async function openSetup(settings) {
   if (settings === "updates") $("#updates").scrollIntoView({ block: "start" });
 }
 $("#settings").onclick = () => openSetup(true);
+$("#stopScan").onclick = async () => {
+  $("#stopScan").disabled = true; $("#stopScan").textContent = "Stopping…";
+  await post("/stop");
+};
 
 // ---- the Creative Mash shapes ----
 // A new random set on each visit; click (or press Enter on) the shapes for a new set.
@@ -421,16 +433,16 @@ const SHAPES = ["circle", "q-tl", "q-tr", "q-bl", "q-br", "t-tl", "t-tr", "t-bl"
 const FILLS = ["--g-blue", "--g-pink", "--g-orange", "--g-green", "--g-yellow", "--g-purple", "--g-sky", "--g-navy"];
 const anyOf = a => a[Math.floor(Math.random() * a.length)];
 function shapeSet(prev) {
-  let set;
-  do {
-    set = Array.from({ length: 12 }, (_, i) => {
-      if (Math.random() < 0.25) return null;
-      let c;
-      do { c = { s: anyOf(SHAPES), f: anyOf(FILLS) }; } while (prev && prev[i] && prev[i].s === c.s && prev[i].f === c.f);
-      return c;
-    });
-  } while (set.filter(Boolean).length < 7 || set.filter(Boolean).length > 10);
-  return set;
+  // How many to show changes each time too: sometimes a few, sometimes most of the grid.
+  const n = 3 + Math.floor(Math.random() * 8); // 3 to 10 of the 12 cells
+  const on = new Set();
+  while (on.size < n) on.add(Math.floor(Math.random() * 12));
+  return Array.from({ length: 12 }, (_, i) => {
+    if (!on.has(i)) return null;
+    let c;
+    do { c = { s: anyOf(SHAPES), f: anyOf(FILLS) }; } while (prev && prev[i] && prev[i].s === c.s && prev[i].f === c.f);
+    return c;
+  });
 }
 let ORN = shapeSet();
 const ornClass = c => "orn " + (c ? c.s : "blank");
