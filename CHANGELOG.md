@@ -2,6 +2,12 @@
 
 Each release is listed here, newest first. The Settings page shows the notes for a new version when you check for updates, so keep each entry short and in plain words.
 
+## 1.4.0
+
+- A folder of frames has a See all files button. It opens every frame in the folder, so you can tick and remove single ones instead of the whole folder. Frames you move to the Trash leave the panel, and the folder's size and count go down.
+- A project menu next to the search box lets you show or hide whole projects. Clicking a project in the chart shows only that one.
+- Tidier layout: the checkbox lines up with each name, the summary cards and shapes take less room, sections are evenly spaced, and the note at the bottom no longer sits under the bar.
+
 ## 1.3.1
 
 - New pictures on the GitHub page showing the thumbnails and the video preview.

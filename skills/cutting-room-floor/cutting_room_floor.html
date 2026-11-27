@@ -60,7 +60,7 @@
   .lead code { font: 400 .8em var(--mono); color: var(--ink); }
 
   /* facts row */
-  .facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1.5px solid var(--ink); }
+  .facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--rule); }
   .facts div { padding: 18px 18px 4px 0; display: flex; flex-direction: column; gap: 8px; }
   .facts div + div { padding-left: 18px; border-left: 1px solid var(--rule); }
   .facts b { font-size: clamp(32px, 3.4vw, 54px); font-weight: 500; letter-spacing: -.045em; line-height: 1; font-variant-numeric: tabular-nums; }
@@ -69,8 +69,8 @@
   /* bold cards */
   .cards.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin: clamp(24px, 3vw, 44px) 0; }
-  .bold { position: relative; overflow: hidden; border-radius: 24px; padding: 28px 28px 32px; min-height: 280px; display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; color: #fff; }
-  .bold .mk { position: absolute; right: -18px; top: -18px; width: 140px; height: 140px; background: rgba(255,255,255,.22); }
+  .bold { position: relative; overflow: hidden; border-radius: 24px; padding: 26px 28px 28px; min-height: 0; display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; color: #fff; }
+  .bold .mk { position: absolute; right: -14px; top: -14px; width: 104px; height: 104px; background: rgba(255,255,255,.22); }
   .bold .k { font: 400 13px var(--mono); opacity: .85; }
   .bold b { font-size: clamp(40px, 4vw, 64px); font-weight: 500; letter-spacing: -.045em; line-height: 1; font-variant-numeric: tabular-nums; }
   .bold p { margin: 0; font-size: 16px; line-height: 1.45; max-width: 30ch; }
@@ -78,6 +78,7 @@
 
   /* sections */
   section.block { margin-bottom: clamp(56px, 7vw, 112px); }
+  .cards ~ section.block:not(:last-of-type) { margin-bottom: clamp(24px, 3vw, 44px); }  /* results page: same rhythm as the cards above */
   .head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; margin-bottom: 22px; }
   h2 { margin: 0; font-size: clamp(30px, 3.2vw, 50px); line-height: 1.04; letter-spacing: -.035em; font-weight: 500; }
   .legend { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; color: var(--muted); }
@@ -102,14 +103,30 @@
   .tools { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
   input[type=search] { flex: 1; min-width: 220px; max-width: 440px; height: 48px; padding: 0 18px; border: 0; border-radius: 14px; background: var(--bg); }
   input[type=search]::placeholder { color: var(--muted); }
+  .pj { position: relative; }
+  .pjbtn { display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0 16px 0 18px; border: 0; border-radius: 14px; background: var(--bg); color: var(--ink); font-size: 15px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+  .pjbtn em { font: 400 12px var(--mono); font-style: normal; color: var(--muted); }
+  .pjbtn svg { width: 12px; height: 12px; transition: transform .15s ease; } .pjbtn[aria-expanded=true] svg { transform: rotate(180deg); }
+  .pjbtn.on { background: var(--ink); color: var(--paper); } .pjbtn.on em { color: inherit; opacity: .7; }
+  .pjmenu { position: absolute; z-index: 6; top: calc(100% + 8px); left: 0; width: min(360px, calc(100vw - 40px)); padding: 8px; border-radius: 18px; background: var(--paper); box-shadow: 0 0 0 1px var(--rule), 0 12px 32px rgba(20,21,43,.14); }
+  .pjmenu[hidden] { display: none; }
+  .pjall { display: flex; gap: 6px; padding: 6px 8px 10px; border-bottom: 1px solid var(--hair); margin-bottom: 6px; }
+  .pjall button { border: 0; background: none; padding: 4px 8px; border-radius: 8px; font: 500 13px var(--sans); color: var(--muted); cursor: pointer; } .pjall button:hover { background: var(--bg); color: var(--ink); }
+  .pjlist { max-height: 320px; overflow: auto; }
+  .pjrow { display: grid; grid-template-columns: 18px 1fr auto; gap: 12px; align-items: center; padding: 9px 10px; border-radius: 10px; cursor: pointer; }
+  .pjrow:hover { background: var(--bg); }
+  .pjrow input { width: 16px; height: 16px; margin: 0; accent-color: var(--ink); cursor: pointer; }
+  .pjrow span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 500; }
+  .pjrow small { display: block; font: 400 11.5px var(--mono); color: var(--muted); }
+  .pjrow em { font: 400 12px var(--mono); font-style: normal; color: var(--muted); }
   .chip { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border: 0; border-radius: 999px; background: var(--ink); color: var(--paper); font-size: 14px; font-weight: 500; cursor: pointer; }
 
-  table { width: 100%; border-collapse: collapse; border-top: 1.5px solid var(--ink); }
+  table { width: 100%; border-collapse: collapse; border-top: 1px solid var(--rule); }
   td { padding: 20px 14px; border-bottom: 1px solid var(--hair); vertical-align: top; }
   td:first-child { padding-left: 0; } td:last-child { padding-right: 0; }
   tr.grp td { padding: 14px 0 10px; border-bottom: 1px solid var(--rule); font: 400 13px var(--mono); color: var(--muted); }
   tr.gone td { opacity: .4; } tr.gone .nm { text-decoration: line-through; }
-  td.ck { width: 34px; padding-top: 22px; }
+  td.ck { width: 26px; padding-top: 25px; } td.ck + td { padding-left: 10px; }
   td.ck input { width: 18px; height: 18px; accent-color: #1d1e1b; margin: 0; cursor: pointer; }
   .nm { font-size: 18px; font-weight: 500; letter-spacing: -.02em; word-break: break-word; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
   .nm .cnt { font: 400 13px var(--mono); color: var(--muted); letter-spacing: 0; }
@@ -136,6 +153,33 @@
   .bigplay svg { width: 30px; height: 30px; margin-left: 5px; }
   .pvmsg { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); display: flex; align-items: center; gap: 14px; padding: 10px 10px 10px 18px; border-radius: 999px; background: var(--paper); box-shadow: 0 6px 20px rgba(0,0,0,.25); font-size: 14px; white-space: nowrap; }
   .pvmsg p { margin: 0; color: var(--ink); }
+  .nm .openfv { display: inline-flex; align-items: center; gap: 7px; padding: 4px 12px 4px 10px; border: 1px solid var(--ink); border-radius: 999px; background: transparent; color: var(--ink); font: 500 12px var(--mono); letter-spacing: 0; cursor: pointer; transition: background .12s ease, color .12s ease; }
+  .nm .openfv:hover { background: var(--ink); color: var(--paper); } .nm .openfv svg { width: 13px; height: 13px; }
+  .th[data-fv] { cursor: pointer; }
+  dialog.fv { max-width: min(1240px, calc(100% - 40px)); width: 100%; height: calc(100vh - 60px); max-height: none; padding: 0; display: none; flex-direction: column; overflow: hidden; }
+  dialog.fv[open] { display: flex; }
+  .fvhead { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; padding: 26px 28px 16px; }
+  .fvhead h2 { margin: 0; font-size: 26px; letter-spacing: -.03em; font-weight: 500; }
+  .fvtools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 0 28px 16px; border-bottom: 1px solid var(--hair); }
+  .fvtools .hint { margin-left: auto; font: 400 12.5px var(--mono); color: var(--muted); }
+  .fvgrid { flex: 1; overflow: auto; padding: 20px 28px 28px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 18px 14px; align-content: start; }
+  .ftile { position: relative; display: block; min-width: 0; padding: 0; border: 0; background: none; text-align: left; color: inherit; font: inherit; cursor: pointer; }
+  .ftile .fpic { position: relative; aspect-ratio: 1; border-radius: 14px; overflow: hidden; background: var(--bg); display: grid; place-items: center; color: var(--muted); box-shadow: 0 0 0 0 var(--ink); transition: box-shadow .12s ease; }
+  .ftile .fpic svg { width: 26px; height: 26px; } .ftile .fpic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .ftile .fpic.wait svg { animation: pulse 1.6s ease-in-out infinite; }
+  .ftile .tick { position: absolute; left: 9px; top: 9px; width: 24px; height: 24px; border-radius: 50%; background: rgba(250,249,245,.88); box-shadow: inset 0 0 0 1.5px rgba(29,30,27,.55); display: grid; place-items: center; color: transparent; z-index: 1; }
+  .ftile .tick svg { width: 13px; height: 13px; }
+  .ftile.on .fpic { box-shadow: 0 0 0 3px var(--ink); } .ftile.on .tick { background: var(--ink); box-shadow: none; color: #fff; }
+  .ftile .zoom { position: absolute; right: 8px; top: 8px; width: 30px; height: 30px; border: 0; border-radius: 50%; background: rgba(20,21,43,.7); color: #fff; display: grid; place-items: center; cursor: zoom-in; opacity: 0; transition: opacity .12s ease; z-index: 1; }
+  .ftile .zoom svg { width: 15px; height: 15px; } .ftile:hover .zoom, .ftile .zoom:focus-visible { opacity: 1; }
+  @media (hover: none) { .ftile .zoom { opacity: 1; } }
+  .ftile .fn { margin-top: 8px; font: 400 12.5px var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ftile .fs { font: 400 12px var(--mono); color: var(--muted); margin-top: 2px; }
+  .ftile.gone { opacity: .38; cursor: default; } .ftile.gone .fn { text-decoration: line-through; }
+  .ftile:focus-visible { outline: none; } .ftile:focus-visible .fpic { box-shadow: 0 0 0 3px var(--g-sky, #3789f7); }
+  .fvfoot { display: flex; align-items: center; gap: 12px; padding: 16px 28px; border-top: 1px solid var(--hair); background: var(--paper); }
+  .fvfoot .big { font-size: 24px; font-weight: 500; letter-spacing: -.03em; } .fvfoot .eyebrow { margin-right: auto; }
+  .tag.inside { background: var(--ink); color: var(--paper); }
   .pv img { display: block; max-width: 100%; max-height: calc(100vh - 210px); transition: filter .2s ease; }
   .pv img.soft { width: min(760px, calc(100vw - 80px)); filter: blur(12px); }
   .pv .cap { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 16px 8px 4px; }
@@ -165,7 +209,8 @@
   dialog ul { max-height: 220px; overflow: auto; margin: 20px 0 0; padding: 14px 18px; list-style: none; background: var(--bg); border-radius: 14px; font: 400 12.5px/1.7 var(--mono); color: var(--muted); }
   .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 26px; }
   .toast { position: fixed; top: 88px; left: 50%; transform: translateX(-50%); display: none; align-items: center; gap: 10px; padding: 11px 18px 11px 14px; border-radius: 999px; background: var(--ink); color: var(--paper); font-size: 14px; font-weight: 500; z-index: 9; box-shadow: 0 0 0 1px rgba(250,249,245,.28), 0 6px 18px rgba(0,0,0,.18); }
-  main { padding-bottom: 130px; }
+  main.wrap { padding-bottom: 72px; }
+  body:has(#foot:not([hidden])) main.wrap { padding-bottom: 152px; }  /* room above the fixed bar */
 
   /* first-run folder picker */
   .picks { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
@@ -215,6 +260,7 @@
   /* the Creative Mash shapes: random on each visit, new ones on every click */
   .intro.hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: clamp(32px, 5vw, 80px); align-items: center; }
   .orns { --cell: clamp(54px, 6.2vw, 92px); display: grid; grid-template-columns: repeat(4, var(--cell)); grid-auto-rows: var(--cell); gap: 10px; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 12px; }
+  .intro.hero .orns { --cell: clamp(40px, 4.2vw, 62px); gap: 8px; }  /* results and setup pages: a smaller mark */
   .orns:focus-visible { outline: 2px solid var(--ink); outline-offset: 10px; }
   .orn { display: block; width: 100%; height: 100%; transition: opacity .2s var(--ease), transform .2s var(--ease); }
   .orn.out { opacity: 0; transform: scale(.55); }
@@ -233,7 +279,7 @@
     .intro.hero, .loading.scan { display: block; } .orns { display: none; }
     .updbar { display: grid; grid-template-columns: auto 1fr; gap: 10px 12px; border-radius: 18px; padding: 14px 16px; width: auto; } .updbar .dot { margin-top: 7px; } .updbar button { grid-column: 2; justify-self: start; }
     .crumb { display: none; } header.top .wrap { gap: 8px; }
-    .cards, .cards.two { grid-template-columns: 1fr; } .bold { min-height: 220px; }
+    .cards, .cards.two { grid-template-columns: 1fr; }
     .facts { grid-template-columns: 1fr 1fr; } .facts div:nth-child(3) { padding-left: 0; border-left: 0; }
     .proj { grid-template-columns: 110px 1fr 64px; gap: 12px; } td.act { display: none; } .chart { padding: 8px 18px; }
     .th { width: 52px; height: 52px; border-radius: 10px; } .itm { gap: 12px; } .pv .cap { flex-direction: column; align-items: flex-start; }
@@ -280,6 +326,12 @@
   <div class="cap"><div><div class="nm" id="pvName"></div><div class="pth" id="pvMeta"></div></div>
     <div class="row"><button class="pill ring sm" id="pvOpen" hidden>Open in video player</button><button class="pill ring sm" id="pvRev"></button><button class="pill solid sm" id="pvClose">Close</button></div></div>
 </dialog>
+<dialog id="fv" class="fv" aria-labelledby="fvName">
+  <div class="fvhead"><div><h2 id="fvName"></h2><div class="pth" id="fvMeta"></div></div><button class="pill ghost sm" id="fvClose">Done</button></div>
+  <div class="fvtools"><button class="pill ring sm" id="fvAll">Select all</button><button class="pill ghost sm" id="fvNone">Clear</button><span class="hint">Click to tick · Shift-click for a run · <span id="fvZoomHint"></span></span></div>
+  <div class="fvgrid" id="fvGrid" role="group" aria-label="Files in this folder"></div>
+  <div class="fvfoot"><span class="big" id="fvSize">0 B</span><span class="eyebrow" id="fvCount">0 selected</span><button class="pill solid" id="fvTrash" disabled>Move to Trash</button></div>
+</dialog>
 <div class="toast" id="toast" role="status"></div>
 
 <script nonce="__NONCE__">
@@ -301,6 +353,7 @@ const ICON_OUT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 const ICON_PIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="m21 16-5-5-9 9"/></svg>';
 const ICON_PLAY = '<span class="play"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 1v8l7-4z" fill="currentColor"/></svg></span>';
 const ICON_FILM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="m10 9 5 3-5 3z"/></svg>';
+const ICON_GRID = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1.2"/><rect x="9" y="1.5" width="5.5" height="5.5" rx="1.2"/><rect x="1.5" y="9" width="5.5" height="5.5" rx="1.2"/><rect x="9" y="9" width="5.5" height="5.5" rx="1.2"/></svg>';
 const IS_VIDEO = /\.(mp4|mov|mxf|avi|mkv|m4v|webm|prores)$/i;
 
 // Pictures come from the server by item id, with the token, and are shown as blob: URLs.
@@ -322,9 +375,101 @@ async function loadThumb(b) {
   const url = await pic(b.dataset.pv, "s");
   b.classList.remove("wait");
   if (!b.isConnected) return;
-  if (url) { b.innerHTML = `<img src="${url}" alt="">${IS_VIDEO.test(b.dataset.name) ? ICON_PLAY : ""}`; return; }
+  if (url) { b.innerHTML = `<img src="${url}" alt="">${b.dataset.fv ? `<span class="play">${ICON_GRID}</span>` : IS_VIDEO.test(b.dataset.name) ? ICON_PLAY : ""}`; return; }
   b.classList.add("none"); b.disabled = true; b.setAttribute("aria-label", "No preview for this file");
 }
+// ---- a frame folder, file by file ----
+const KIDS = new Map();  // id -> file inside an opened frame folder
+const itemById = id => (D && D.items.find(i => i.id === id)) || KIDS.get(id);
+const ICON_TICK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3.5 8.5 3 3 6-7"/></svg>';
+const ICON_ZOOM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>';
+let FV = null, fvLast = null, fvObs = null;
+async function openFolder(id) {
+  const f = itemById(id);
+  if (!f) return;
+  FV = { id, files: [], total: 0 };
+  $("#fvName").textContent = f.name;
+  $("#fvMeta").textContent = tilde(f.path);
+  $("#fvZoomHint").textContent = "the corner arrows show it big";
+  $("#fvGrid").innerHTML = `<p class="note">Opening the folder…</p>`;
+  if (!$("#fv").open) $("#fv").showModal();
+  let r = null;
+  try { r = await (await fetch(`/folder?id=${encodeURIComponent(id)}`, { headers: { "X-Token": TOKEN } })).json(); } catch (e) {}
+  if (!FV || FV.id !== id) return;
+  if (!r || !r.files) { $("#fvGrid").innerHTML = `<p class="note">This folder can’t be opened now. It may have been moved.</p>`; return; }
+  [...KIDS.keys()].forEach(k => { if (KIDS.get(k).parent === id) KIDS.delete(k); });
+  r.files.forEach(k => KIDS.set(k.id, k));
+  FV.files = r.files; FV.total = r.total;
+  fvLast = null;
+  fvRender();
+}
+function fvRender() {
+  const f = itemById(FV.id), grid = $("#fvGrid");
+  const whole = sel.has(FV.id);
+  const moved = FV.files.filter(k => gone.has(k.id)).length;
+  $("#fvMeta").textContent = `${tilde(f.path)} · ${f.count} files · ${fmt(f.size)}${moved ? ` · ${moved} moved to the ${OS.bin}` : ""}${FV.total > FV.files.length ? ` · showing the first ${FV.files.length}` : ""}`;
+  if (fvObs) fvObs.disconnect();
+  fvObs = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { fvObs.unobserve(e.target); loadThumb(e.target); } }), { root: grid, rootMargin: "400px 0px" });
+  grid.innerHTML = FV.files.map((k, n) => {
+    if (gone.has(k.id)) return "";  // moved to the Trash: no longer shown
+    const g = false, on = whole || sel.has(k.id);
+    return `<div class="ftile${on ? " on" : ""}${g ? " gone" : ""}" data-k="${k.id}" data-n="${n}" role="checkbox" aria-checked="${on}" aria-disabled="${g}" tabindex="${g ? -1 : 0}" aria-label="${esc(k.name)}, ${fmt(k.size)}">
+      <div class="fpic" ${k.preview && !g ? `data-pv="${k.id}" data-name="${esc(k.name)}"` : ""}>${ICON_PIC}</div>
+      ${g ? "" : `<span class="tick">${ICON_TICK}</span>${k.preview ? `<button class="zoom" data-zoom="${k.id}" aria-label="Show ${esc(k.name)} big" tabindex="-1">${ICON_ZOOM}</button>` : ""}`}
+      <div class="fn">${esc(k.name)}</div><div class="fs">${g ? `In the ${esc(OS.bin)}` : fmt(k.size)}</div></div>`;
+  }).join("").trim() || `<p class="note">There are no pictures left in this folder.</p>`;
+  grid.querySelectorAll(".fpic[data-pv]").forEach(b => fvObs.observe(b));
+  fvFoot();
+}
+function fvFoot() {
+  const live = FV.files.filter(k => !gone.has(k.id));
+  const picked = sel.has(FV.id) ? live : live.filter(k => sel.has(k.id));
+  $("#fvSize").textContent = fmt(picked.reduce((a, k) => a + k.size, 0));
+  $("#fvCount").textContent = `${picked.length} of ${live.length} selected`;
+  const s = selection();
+  $("#fvTrash").disabled = !s.length;
+  $("#fvTrash").textContent = s.length > picked.length ? `Move ${s.length} to ${OS.bin}` : `Move to ${OS.bin}`;
+  $("#fvTrash").title = s.length > picked.length ? "Includes things you ticked outside this folder" : "";
+}
+function fvSet(ids, on) {
+  if (sel.has(FV.id)) {  // the whole folder was ticked: tick its files one by one instead
+    sel.delete(FV.id);
+    FV.files.forEach(k => { if (!gone.has(k.id)) sel.add(k.id); });
+  }
+  ids.forEach(id => on ? sel.add(id) : sel.delete(id));
+  $("#fvGrid").querySelectorAll(".ftile").forEach(t => {
+    const v = !t.classList.contains("gone") && sel.has(t.dataset.k);
+    t.classList.toggle("on", v); t.setAttribute("aria-checked", v);
+  });
+  fvFoot(); renderList();
+}
+
+function wireFolder() {
+  $("#fvGrid").addEventListener("click", e => {
+    const z = e.target.closest("[data-zoom]");
+    if (z) { e.stopPropagation(); return openPreview(z.dataset.zoom); }
+    const t = e.target.closest(".ftile");
+    if (!t || t.classList.contains("gone")) return;
+    const n = +t.dataset.n, on = !t.classList.contains("on");
+    if (e.shiftKey && fvLast != null) {  // a run, from the last one clicked
+      const [a, b] = [Math.min(fvLast, n), Math.max(fvLast, n)];
+      fvSet(FV.files.slice(a, b + 1).filter(k => !gone.has(k.id)).map(k => k.id), on);
+    } else fvSet([t.dataset.k], on);
+    fvLast = n;
+  });
+  $("#fvGrid").addEventListener("dblclick", e => { const t = e.target.closest(".ftile"); const k = t && KIDS.get(t.dataset.k); if (k && k.preview && !gone.has(k.id)) openPreview(k.id); });
+  $("#fvGrid").addEventListener("keydown", e => {
+    const t = e.target.closest(".ftile");
+    if (!t) return;
+    if (e.key === " " || e.key === "Enter") { e.preventDefault(); t.click(); }
+  });
+  $("#fvAll").onclick = () => fvSet(FV.files.filter(k => !gone.has(k.id)).map(k => k.id), true);
+  $("#fvNone").onclick = () => { sel.delete(FV.id); fvSet(FV.files.map(k => k.id), false); };
+  $("#fvClose").onclick = () => $("#fv").close();
+  $("#fv").addEventListener("close", () => { if (fvObs) fvObs.disconnect(); FV = null; renderList(); });
+  $("#fvTrash").onclick = () => $("#trashBtn").onclick();
+}
+
 function resetPlayer() {
   const v = $("#pvVid");
   v.onerror = v.onloadedmetadata = null;
@@ -356,7 +501,7 @@ function cantPlay(id) {
   $("#pvMsg").hidden = false;
 }
 async function openPreview(id) {
-  const it = D && D.items.find(i => i.id === id);
+  const it = D && itemById(id);
   if (!it) return;
   const dlg = $("#pv"), img = $("#pvImg");
   dlg.dataset.id = id;
@@ -382,7 +527,7 @@ async function openPreview(id) {
   const big = await pic(id, "l");
   if (dlg.open && dlg.dataset.id === id && big) { img.src = big; img.classList.remove("soft"); }
 }
-let D = null, view = { kind: "all", project: null, q: "" };
+let D = null, view = { kind: "all", hide: new Set(), q: "" };
 let OS = { computer: "computer", reveal: "Show in folder", bin: "Trash" }, HOME_DIR = "", SEP = "/";
 let APP = { version: "", install: "zip", can_pick: false, check_updates: false }, UPD = null, autoChecked = false;
 const sel = new Set(), gone = new Set();
@@ -528,7 +673,7 @@ async function openSetup(settings) {
     const res = await post("/setup", { roots, caches: $("#useCaches").checked, hide: [...hide], listed });
     $("#startScan").disabled = false;
     if (res.error) { $("#setupErr").textContent = res.error; return; }
-    sel.clear(); gone.clear(); view = { kind: "all", project: null, q: "" };
+    sel.clear(); gone.clear(); view = { kind: "all", hide: new Set(), q: "" };
     scanning(); setTimeout(poll, 400);
   };
   if (!settings) return;
@@ -687,6 +832,7 @@ function render() {
   const counts = {}; KINDS.forEach(([k]) => counts[k] = 0);
   D.items.forEach(i => { if (!gone.has(i.id) && i.risk !== "keep") { counts.all++; counts[kindOf(i)]++; } });
   const hasCaches = D.items.some(i => i.kind === "cache");
+  const pl = projList(), only = onlyProject(pl);
 
   $("#app").innerHTML = `
     <div class="intro hero"><div>
@@ -719,7 +865,7 @@ function render() {
       </div>
       <div class="chart">
       ${projs.slice(0, 24).map(([nm, c, tot]) => `
-        <button class="proj ${view.project === nm ? "on" : ""}" data-p="${esc(nm)}" aria-pressed="${view.project === nm}" title="Show only this project">
+        <button class="proj ${only === nm ? "on" : ""}" data-p="${esc(nm)}" aria-pressed="${only === nm}" title="Show only this project">
           <span class="pn">${esc(nm.split(" / ")[1])}<small>${esc(nm.split(" / ")[0])}</small></span>
           <span class="bar" style="width:${Math.max(1, tot / maxP * 100)}%">${SEG.map(([k, l, col]) => c[k] ? `<div style="flex:${c[k]};background:var(${col})" title="${esc(l)}: ${fmt(c[k])}"></div>` : "").join("")}</span>
           <span class="num">${fmt(tot)}</span>
@@ -733,16 +879,20 @@ function render() {
       <div class="tabs" role="tablist">${KINDS.map(([k, l, c]) => `<button class="tab ${view.kind === k ? "on" : ""}" role="tab" aria-selected="${view.kind === k}" data-k="${k}">${c ? dot(c) : ""}${l}<em>${counts[k]}</em></button>`).join("")}</div>
       <div class="tools">
         <input type="search" id="q" aria-label="Filter by name or path" placeholder="Filter by name or path" value="${esc(view.q)}">
-        ${view.project ? `<button class="chip" id="unproj" aria-label="Remove project filter">${esc(view.project.split(" / ")[1])} <span aria-hidden="true">×</span></button>` : ""}
+        ${pl.length > 1 ? projPicker(pl) : ""}
       </div>
       <table id="list"></table>
     </section>
     ${credit()}`;
 
-  document.querySelectorAll(".proj").forEach(el => el.onclick = () => { view.project = view.project === el.dataset.p ? null : el.dataset.p; render(); });
+  document.querySelectorAll(".proj").forEach(el => el.onclick = () => {
+    const p = el.dataset.p;
+    view.hide = onlyProject(projList()) === p ? new Set() : new Set(projList().map(x => x.name).filter(n => n !== p));
+    render(); $("#list").closest("section").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
   document.querySelectorAll(".tab").forEach(el => el.onclick = () => { view.kind = el.dataset.k; render(); });
   $("#q").oninput = e => { view.q = e.target.value; renderList(); };
-  if ($("#unproj")) $("#unproj").onclick = () => { view.project = null; render(); };
+  wirePicker();
   $("#rescan").hidden = false;
   $("#settings").hidden = false;
   $("#settings").textContent = "Settings";
@@ -757,11 +907,53 @@ $("#rescan").onclick = async () => {
   scanning(); setTimeout(poll, 400);
 };
 
+// projects that have something to review, biggest first
+function projList() {
+  const m = new Map();
+  D.items.forEach(i => { if (i.risk === "keep" || gone.has(i.id)) return;
+    const p = m.get(i.project) || { name: i.project, n: 0, size: 0 }; p.n++; p.size += i.size; m.set(i.project, p); });
+  return [...m.values()].sort((a, b) => b.size - a.size);
+}
+const onlyProject = pl => { const on = pl.filter(p => !view.hide.has(p.name)); return on.length === 1 && pl.length > 1 ? on[0].name : null; };
+const ICON_DOWN = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg>';
+function projLabel(pl) {
+  const on = pl.filter(p => !view.hide.has(p.name));
+  if (on.length === pl.length) return `All projects <em>${pl.length}</em>`;
+  if (on.length === 1) return esc(on[0].name.split(" / ").pop());
+  return `${on.length} of ${pl.length} projects`;
+}
+function projPicker(pl) {
+  return `<div class="pj"><button class="pjbtn ${view.hide.size ? "on" : ""}" id="pjBtn" aria-haspopup="true" aria-expanded="false" aria-controls="pjMenu">${projLabel(pl)}${ICON_DOWN}</button>
+    <div class="pjmenu" id="pjMenu" hidden role="group" aria-label="Projects to show">
+      <div class="pjall"><button data-pj="all">Show all</button><button data-pj="none">Clear all</button></div>
+      <div class="pjlist">${pl.map(p => { const [root, ...rest] = p.name.split(" / "); return `
+        <label class="pjrow"><input type="checkbox" value="${esc(p.name)}" ${view.hide.has(p.name) ? "" : "checked"}>
+          <span>${esc(rest.join(" / ") || root)}<small>${esc(root)} · ${p.n} item${p.n > 1 ? "s" : ""}</small></span><em>${fmt(p.size)}</em></label>`; }).join("")}</div>
+    </div></div>`;
+}
+function wirePicker() {
+  const btn = $("#pjBtn"), menu = $("#pjMenu"); if (!btn) return;
+  const show = open => { menu.hidden = !open; btn.setAttribute("aria-expanded", open); };
+  const sync = () => {   // the button, the chart and the list follow the ticks
+    const pl = projList(), only = onlyProject(pl);
+    btn.innerHTML = projLabel(pl) + ICON_DOWN; btn.classList.toggle("on", view.hide.size > 0);
+    menu.querySelectorAll("input").forEach(c => c.checked = !view.hide.has(c.value));
+    document.querySelectorAll(".proj").forEach(el => { el.classList.toggle("on", el.dataset.p === only); el.setAttribute("aria-pressed", el.dataset.p === only); });
+    renderList();
+  };
+  btn.onclick = e => { e.stopPropagation(); show(menu.hidden); };
+  menu.onclick = e => e.stopPropagation();
+  menu.onchange = e => { const c = e.target; if (c.type !== "checkbox") return; c.checked ? view.hide.delete(c.value) : view.hide.add(c.value); sync(); };
+  menu.querySelectorAll("[data-pj]").forEach(b => b.onclick = () => { view.hide = b.dataset.pj === "all" ? new Set() : new Set(projList().map(p => p.name)); sync(); });
+  document.addEventListener("click", () => show(false), { once: false, signal: (wirePicker.ac?.abort(), wirePicker.ac = new AbortController()).signal });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !menu.hidden) { show(false); btn.focus(); } }, { signal: wirePicker.ac.signal });
+}
+
 function visible() {
   const q = view.q.trim().toLowerCase();
   return D.items.filter(i => i.risk !== "keep" &&
     (view.kind === "all" || kindOf(i) === view.kind) &&
-    (!view.project || i.project === view.project) &&
+    !view.hide.has(i.project) &&
     (!q || i.path.toLowerCase().includes(q)));
 }
 
@@ -770,9 +962,11 @@ function row(i, maxS) {
   const [label, col] = RISK[i.risk];
   const nb = i.no_bin && !g;
   const pv = (i.preview || i.video) && !g;
+  const fold = i.is_dir && i.kind === "media" && !g;
+  const inside = fold && !sel.has(i.id) ? [...KIDS.values()].filter(k => k.parent === i.id && sel.has(k.id)).length : 0;
   return `<tr class="${g ? "gone" : ""}">
     <td class="ck"><input type="checkbox" aria-label="Select ${esc(i.name)}" data-id="${i.id}" ${sel.has(i.id) ? "checked" : ""} ${g || nb ? "disabled" : ""}></td>
-    <td>${pv ? `<div class="itm"><button class="th" data-pv="${i.id}" data-name="${esc(i.name)}" ${i.preview ? "data-pic" : ""} aria-label="${i.preview ? "Preview" : "Play"} ${esc(i.name)}">${i.preview ? ICON_PIC : ICON_FILM}</button><div>` : ""}<div class="nm">${esc(i.name)}${i.count ? `<span class="cnt">${i.count} files</span>` : ""}<span class="tag">${dot(col)}${label}</span>${nb ? `<span class="tag">${dot("--g-orange")}Can’t go to the ${esc(OS.bin)}</span>` : ""}</div>
+    <td>${pv ? `<div class="itm"><button class="th" data-pv="${i.id}" data-name="${esc(i.name)}" ${i.preview ? "data-pic" : ""} ${fold ? `data-fv="${i.id}"` : ""} aria-label="${fold ? `See the files in` : i.preview ? "Preview" : "Play"} ${esc(i.name)}">${i.preview ? ICON_PIC : ICON_FILM}</button><div>` : ""}<div class="nm">${esc(i.name)}${i.count != null ? (fold ? `<button class="openfv" data-fv="${i.id}">${ICON_GRID}See all ${i.count} files</button>` : `<span class="cnt">${i.count} files</span>`) : ""}${inside ? `<span class="tag inside">${inside} ticked inside</span>` : ""}<span class="tag">${dot(col)}${label}</span>${nb ? `<span class="tag">${dot("--g-orange")}Can’t go to the ${esc(OS.bin)}</span>` : ""}</div>
       <div class="pth">${esc(tilde(i.path))}</div><div class="note">${esc(i.note)}</div>${nb ? `<div class="note"><b>${esc(i.no_bin)}</b></div>` : ""}${pv ? "</div></div>" : ""}</td>
     <td class="sz">${fmt(i.size)}<div class="mini" style="width:${Math.max(4, i.size / maxS * 100)}%"></div></td>
     <td class="act">${g ? `<span class="eyebrow">In the ${esc(OS.bin)}</span>` : `<button class="pill ring sm" data-rev="${i.id}">${esc(OS.reveal)} ${ICON_OUT}</button>`}</td></tr>`;
@@ -791,16 +985,17 @@ function renderList() {
   } else {
     html = items.sort((a, b) => b.size - a.size).map(i => row(i, maxS)).join("");
   }
-  $("#list").innerHTML = html || `<tr><td class="empty">Nothing here${view.project || view.q ? " with the current filter" : ""}.</td></tr>`;
+  $("#list").innerHTML = html || `<tr><td class="empty">Nothing here${view.hide.size || view.q ? " with the current filter" : ""}.</td></tr>`;
   $("#list").querySelectorAll("input[type=checkbox]").forEach(cb => cb.onchange = () => { cb.checked ? sel.add(cb.dataset.id) : sel.delete(cb.dataset.id); updateFoot(); });
   $("#list").querySelectorAll("[data-rev]").forEach(b => b.onclick = () => post("/reveal", { id: b.dataset.rev }));
-  $("#list").querySelectorAll("[data-pv]").forEach(b => { b.onclick = () => openPreview(b.dataset.pv); if (b.hasAttribute("data-pic")) thumbs.observe(b); });
+  $("#list").querySelectorAll("[data-pv]").forEach(b => { b.onclick = () => b.dataset.fv ? openFolder(b.dataset.fv) : openPreview(b.dataset.pv); if (b.hasAttribute("data-pic")) thumbs.observe(b); });
+  $("#list").querySelectorAll(".openfv").forEach(b => b.onclick = () => openFolder(b.dataset.fv));
   updateFoot();
 }
 
 // Unique, non-nested selection, so the same bytes are never counted twice.
 function selection() {
-  const its = [...sel].map(id => D.items.find(i => i.id === id)).filter(Boolean).sort((a, b) => a.path.length - b.path.length);
+  const its = [...sel].map(itemById).filter(Boolean).sort((a, b) => a.path.length - b.path.length);
   const out = [];
   for (const i of its) if (!out.some(o => i.path === o.path || i.path.startsWith(o.path + SEP))) out.push(i);
   return out;
@@ -843,12 +1038,20 @@ $("#dlgOk").onclick = async () => {
   const ok = r.results.filter(x => x.ok), bad = r.results.filter(x => !x.ok);
   ok.forEach(x => {
     gone.add(x.id); sel.delete(x.id);
-    const p = D.items.find(i => i.id === x.id).path;   // anything inside a removed folder is gone too
-    D.items.forEach(i => { if (i.path.startsWith(p + SEP)) { gone.add(i.id); sel.delete(i.id); } });
+    const it = itemById(x.id), p = it.path;   // anything inside a removed folder is gone too
+    [...D.items, ...KIDS.values()].forEach(i => { if (i.path.startsWith(p + SEP)) { gone.add(i.id); sel.delete(i.id); } });
+    const up = it.parent && itemById(it.parent);  // a file from a frame folder: the folder gets smaller
+    if (up) {
+      up.size = Math.max(0, up.size - it.size); up.count = Math.max(0, (up.count || 1) - 1);
+      up.note = (up.note || "").replace(/^Folder of \d+/, `Folder of ${up.count}`);
+      ["s", "l"].forEach(z => PICS.delete(up.id + "|" + z));  // its thumbnail may have been one of these
+    }
   });
+  if ($("#fv").open) fvRender();
   toast(`${ok.length} moved to the ${OS.bin}${bad.length ? ` · ${bad.length} could not be moved: ${bad[0].msg}` : ""}. Empty the ${OS.bin} to get the space back.`);
   render();
 };
+wireFolder();
 poll();
 </script>
 </body>

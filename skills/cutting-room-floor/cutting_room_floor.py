@@ -1186,6 +1186,42 @@ def clear_previews():
         shutil.rmtree(PREVIEW_DIR, ignore_errors=True)
 
 
+# ---- the files inside a frame folder ---------------------------------------
+# Opening a frame folder in the page lists its pictures as items of their own, so
+# they can be previewed and moved to the Trash one by one. Only folders the scan
+# listed can be opened, and links inside them are skipped.
+FOLDER_MAX = 5000
+
+
+def folder_files(it):
+    """Items for the pictures in a frame folder, registered so the usual routes accept their ids."""
+    if not it or not it.get("is_dir") or it.get("kind") != "media":
+        return None
+    d = Path(it["path"])
+    try:
+        if d.is_symlink() or not d.is_dir():
+            return None
+        entries = sorted((e for e in os.scandir(d) if e.is_file(follow_symlinks=False)
+                          and Path(e.name).suffix.lower() in IMAGE), key=lambda e: e.name.lower())
+    except OSError:
+        return None
+    for k in [k for k, v in ITEMS.items() if v.get("parent") == it["id"]]:
+        del ITEMS[k]
+    kids = []
+    for n, e in enumerate(entries[:FOLDER_MAX]):
+        try:
+            size = e.stat(follow_symlinks=False).st_size
+        except OSError:
+            continue
+        kid = dict(id=f"{it['id']}.{n}", kind="frame", path=e.path, name=e.name, size=size, project=it.get("project"),
+                   risk=it.get("risk", "review"), note="", parent=it["id"])
+        if can_preview(kid):
+            kid["preview"] = True
+        ITEMS[kid["id"]] = kid
+        kids.append(kid)
+    return dict(files=kids, total=len(entries))
+
+
 # ---- playing videos ---------------------------------------------------------
 # A <video> can't send the page's token, so pressing play first asks (with the token)
 # for a pass. The pass names one video from the scan, works only on this server,
@@ -1358,6 +1394,9 @@ class Handler(BaseHTTPRequestHandler):
             out.update(os=OS_INFO, home=str(HOME), sep=os.sep, version=app_version(), install=install_type(), can_pick=can_pick(), roots=[str(r) for r in self.server.roots],
                        check_updates=bool(load_config().get("check_updates", False)))
             return self.send(200, json.dumps(out))
+        if path == "/folder":
+            got = folder_files(ITEMS.get(parse_qs(self.path.partition("?")[2]).get("id", [""])[0]))
+            return self.send(200 if got else 404, json.dumps(got or {}))
         if path == "/update-status":
             return self.send(200, json.dumps(UPDATE_JOB))
         if path == "/suggest":
@@ -1423,6 +1462,11 @@ class Handler(BaseHTTPRequestHandler):
                     continue
                 try:
                     results.append(dict(id=iid, ok=True, msg=move_to_trash(it["path"], it["size"])))
+                    up = ITEMS.get(it.get("parent"))
+                    if up:
+                        up["size"] = max(0, up["size"] - it["size"])
+                        up["count"] = max(0, up.get("count", 1) - 1)
+                        up["note"] = re.sub(r"^Folder of \d+", f"Folder of {up['count']}", up.get("note", ""))
                 except Exception as e:
                     results.append(dict(id=iid, ok=False, msg=str(e)))
             return self.send(200, json.dumps({"results": results}))

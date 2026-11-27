@@ -90,7 +90,9 @@ Media counts as "in use" when a Premiere project, Blender file, After Effects pr
 
 Claude Code session copies (`.claude/worktrees`) are shown separately and can't be removed from the page. Clear old ones in the Claude app.
 
-**See before you choose.** Images and videos have a thumbnail in the list. Click it for a bigger view, or press play to watch a video in the page. A folder of frames shows its first frame. On a Mac, most image types (including PSD, TIFF, HEIC and EXR) and MP4 and MOV videos get thumbnails; on Windows and Linux, PNG, JPG and WebP do. Videos your browser can't play, such as ProRes in Chrome, open in your usual video player instead.
+**See before you choose.** Images and videos have a thumbnail in the list. Click it for a bigger view, or press play to watch a video in the page. A folder of frames shows its first frame; press **See all files** to open it, see every frame, and tick only the ones you want to remove. On a Mac, most image types (including PSD, TIFF, HEIC and EXR) and MP4 and MOV videos get thumbnails; on Windows and Linux, PNG, JPG and WebP do. Videos your browser can't play, such as ProRes in Chrome, open in your usual video player instead.
+
+**Narrow it down.** The project menu next to the search box lists every project with its size. Untick the ones you don't want to see; click a project in the chart to show only that one.
 
 ![Previewing a video before choosing](screenshots/05-preview.png)
 
