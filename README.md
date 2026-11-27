@@ -92,6 +92,8 @@ Claude Code session copies (`.claude/worktrees`) are shown separately and can't 
 
 **See before you choose.** Images and videos have a thumbnail in the list. Click it for a bigger view, or press play to watch a video in the page. A folder of frames shows its first frame. On a Mac, most image types (including PSD, TIFF, HEIC and EXR) and MP4 and MOV videos get thumbnails; on Windows and Linux, PNG, JPG and WebP do. Videos your browser can't play, such as ProRes in Chrome, open in your usual video player instead.
 
+![Previewing a video before choosing](screenshots/05-preview.png)
+
 ![Choosing what to keep](screenshots/04-choose-what-to-keep.png)
 
 ## Options

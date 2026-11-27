@@ -2,6 +2,10 @@
 
 Each release is listed here, newest first. The Settings page shows the notes for a new version when you check for updates, so keep each entry short and in plain words.
 
+## 1.3.1
+
+- New pictures on the GitHub page showing the thumbnails and the video preview.
+
 ## 1.3.0
 
 - Images and videos have a thumbnail in the list. Click it for a bigger view, so you can see what a file is without opening its folder.
