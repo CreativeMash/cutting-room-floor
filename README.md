@@ -86,6 +86,7 @@ Claude Code session copies (`.claude/worktrees`) are shown separately and can't 
 --set-roots F ...    save folders without opening the page
 --show-config        print your saved settings
 --check-update       ask GitHub whether a newer version exists
+--results            print the running scan's findings as JSON
 --version            print the version
 ```
 

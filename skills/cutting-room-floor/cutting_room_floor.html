@@ -222,7 +222,7 @@
 </dialog>
 <div class="toast" id="toast" role="status"></div>
 
-<script>
+<script nonce="__NONCE__">
 const TOKEN = "__TOKEN__";
 const KINDS = [
   ["all", "Everything", null], ["regen", "Rebuildable", "--c-regen"], ["backup", "Backups and copies", "--c-backup"],
@@ -250,6 +250,10 @@ const credit = () => `<p class="credit">Cutting Room Floor is a free tool by <a 
 const kindOf = it => it.kind === "media" ? (it.status === "unused" ? "unused" : "used") : it.kind;
 const dot = v => `<span class="dot" style="background:var(${v})"></span>`;
 
+async function get(url) {
+  const r = await fetch(url, { headers: { "X-Token": TOKEN } });
+  return r.json();
+}
 async function post(url, body) {
   const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json", "X-Token": TOKEN }, body: JSON.stringify(body || {}) });
   return r.json();
@@ -259,7 +263,7 @@ function scanning() {
   $("#app").innerHTML = `<div class="loading"><h1>Checking the cutting room floor</h1><p id="prog" class="lead"></p></div>`;
 }
 async function poll() {
-  const s = await (await fetch("/state")).json();
+  const s = await get("/state");
   OS = s.os; HOME_DIR = s.home; SEP = s.sep;
   APP = { version: s.version, install: s.install, can_pick: s.can_pick, check_updates: s.check_updates };
   $("#trashBtn").textContent = $("#dlgOk").textContent = `Move to ${OS.bin}`;
@@ -273,7 +277,7 @@ async function poll() {
 
 // ---- first run and Settings: the folders to look at, and updates ----
 async function openSetup(settings) {
-  const r = await (await fetch("/suggest")).json();
+  const r = await get("/suggest");
   $("#foot").hidden = true; $("#rescan").hidden = true; $("#settings").hidden = true;
   const picks = r.suggestions;
   const card = (s, suggested) => `<div class="pickbox"${suggested ? ' data-sugg="1"' : ""}><label class="pick"><input type="checkbox" value="${esc(s.path)}" ${s.checked ? "checked" : ""}>

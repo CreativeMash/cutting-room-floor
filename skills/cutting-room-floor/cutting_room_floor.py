@@ -25,6 +25,7 @@ import os
 import re
 import secrets
 import shutil
+import signal
 import stat
 import subprocess
 import sys
@@ -908,24 +909,63 @@ def check_update() -> dict:
 
 
 # ---- the local web page ----------------------------------------------------
+def csp(nonce: str) -> str:
+    """Only the page's own script runs, nothing can frame it, and it only talks to this server."""
+    return ("default-src 'none'; "
+            f"script-src 'nonce-{nonce}'; "
+            "style-src 'unsafe-inline' https://fonts.googleapis.com; "
+            "font-src https://fonts.gstatic.com; "
+            "img-src 'self' data:; connect-src 'self'; "
+            "base-uri 'none'; form-action 'none'; frame-ancestors 'none'")
+
+
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, *a):
         pass
 
-    def send(self, code, body, ctype="application/json"):
+    def send(self, code, body, ctype="application/json", policy=None):
         data = body if isinstance(body, bytes) else body.encode("utf-8")
         self.send_response(code)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(data)))
         self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("X-Frame-Options", "DENY")
+        self.send_header("Referrer-Policy", "no-referrer")
+        self.send_header("Cross-Origin-Resource-Policy", "same-origin")
+        self.send_header("Content-Security-Policy", policy or "default-src 'none'; frame-ancestors 'none'")
         self.end_headers()
         self.wfile.write(data)
+
+    def trusted(self, need_token=True) -> bool:
+        """Turn away anything that isn't this page on this computer.
+        The Host check stops DNS rebinding: a website that points its own name at
+        127.0.0.1 still sends its own name as the Host, so it gets nothing back."""
+        port = self.server.server_address[1]
+        local = {f"127.0.0.1:{port}", f"localhost:{port}"}
+        if (self.headers.get("Host") or "").lower() not in local:
+            self.send(403, json.dumps({"error": "wrong host"}))
+            return False
+        origin = self.headers.get("Origin")
+        if origin and origin.lower() not in {"http://" + h for h in local}:
+            self.send(403, json.dumps({"error": "wrong origin"}))
+            return False
+        if need_token and not secrets.compare_digest(self.headers.get("X-Token") or "", TOKEN):
+            self.send(403, json.dumps({"error": "bad token"}))
+            return False
+        return True
 
     def do_GET(self):
         path = self.path.split("?")[0]
         if path in ("/", "/index.html"):
+            if not self.trusted(need_token=False):
+                return
+            nonce = secrets.token_urlsafe(16)
             html = Path(__file__).with_name("cutting_room_floor.html").read_text("utf-8")
-            return self.send(200, html.replace("__TOKEN__", TOKEN), "text/html; charset=utf-8")
+            html = html.replace("__TOKEN__", TOKEN).replace("__NONCE__", nonce)
+            return self.send(200, html, "text/html; charset=utf-8", policy=csp(nonce))
+        if not self.trusted():
+            return
         if path == "/state":
             out = {k: STATE[k] for k in ("status", "progress", "data", "error")}
             out.update(os=OS_INFO, home=str(HOME), sep=os.sep, version=app_version(), install=install_type(), can_pick=can_pick(),
@@ -939,8 +979,8 @@ class Handler(BaseHTTPRequestHandler):
         self.send(404, "{}")
 
     def do_POST(self):
-        if self.headers.get("X-Token") != TOKEN:
-            return self.send(403, json.dumps({"error": "bad token"}))
+        if not self.trusted():
+            return
         length = int(self.headers.get("Content-Length") or 0)
         try:
             body = json.loads(self.rfile.read(length) or b"{}")
@@ -994,6 +1034,44 @@ class Handler(BaseHTTPRequestHandler):
         self.send(404, "{}")
 
 
+# ---- letting Claude read the results ----------------------------------------
+# The running server keeps its address and token in a file only this person can
+# read, so --results can fetch the findings without the token ever being printed.
+def session_path() -> Path:
+    return config_path().with_name("session.json")
+
+
+def write_session(url: str):
+    p = session_path()
+    try:
+        p.parent.mkdir(parents=True, exist_ok=True)
+        fd = os.open(str(p), os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(dict(url=url, token=TOKEN, pid=os.getpid()), f)
+        if not IS_WIN:
+            os.chmod(p, 0o600)
+    except OSError:
+        pass
+
+
+def clear_session(url: str):
+    try:
+        if json.loads(session_path().read_text("utf-8")).get("url") == url:
+            session_path().unlink()
+    except (OSError, ValueError):
+        pass
+
+
+def print_results():
+    try:
+        s = json.loads(session_path().read_text("utf-8"))
+        req = urllib.request.Request(s["url"] + "/state", headers={"X-Token": s["token"]})
+        with urllib.request.urlopen(req, timeout=5) as r:
+            print(r.read().decode("utf-8"))
+    except (OSError, ValueError, KeyError):
+        sys.exit("Cutting Room Floor isn't running. Start it first.")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--roots", nargs="+", metavar="FOLDER", help="Scan these folders this time, without changing your saved folders")
@@ -1004,6 +1082,7 @@ def main():
     ap.add_argument("--no-caches", action="store_true", help="Skip app and download caches")
     ap.add_argument("--port", type=int, default=8765, help="Port for the page (the next free one is used if taken)")
     ap.add_argument("--no-browser", action="store_true", help="Do not open the page automatically")
+    ap.add_argument("--results", action="store_true", help="Print the running scan's findings as JSON, then exit")
     ap.add_argument("--check-update", action="store_true", help="Ask GitHub whether a newer version exists, print JSON, then exit")
     ap.add_argument("--version", action="version", version=f"Cutting Room Floor {app_version()}")
     a = ap.parse_args()
@@ -1011,6 +1090,9 @@ def main():
 
     if a.check_update:
         print(json.dumps(check_update(), indent=2))
+        return
+    if a.results:
+        print_results()
         return
     if a.show_config:
         print(json.dumps(dict(config_file=str(config_path()), roots=cfg.get("roots", []),
@@ -1052,6 +1134,8 @@ def main():
         STATE["status"] = "setup"
 
     url = f"http://127.0.0.1:{port}"
+    write_session(url)
+    signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))  # stopping it from Claude also tidies up
     print(f"Cutting Room Floor is running at {url}  (press Ctrl+C to stop)", flush=True)
     if STATE["status"] == "setup":
         print("Pick your project folders in the page to start the scan.", flush=True)
@@ -1061,6 +1145,8 @@ def main():
         srv.serve_forever()
     except KeyboardInterrupt:
         pass
+    finally:
+        clear_session(url)
 
 
 if __name__ == "__main__":
