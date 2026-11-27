@@ -28,7 +28,7 @@ claude plugin marketplace add CreativeMash/cutting-room-floor
 claude plugin install cutting-room-floor@creativemash
 ```
 
-If you use Claude Code in a terminal, you can type `/plugin marketplace add CreativeMash/cutting-room-floor` and `/plugin install cutting-room-floor@creativemash` there instead. The `/plugin` commands aren't available in the desktop app.
+Type them straight into Terminal, as they are. (Inside a running Claude Code session, after you've typed `claude`, the same thing is `/plugin marketplace add CreativeMash/cutting-room-floor` and `/plugin install cutting-room-floor@creativemash`. Those `/plugin` versions don't work in a plain Terminal or in the desktop app.)
 
 Then start a new session and ask Claude something like *"what's on my cutting room floor?"* or *"what's taking up space in my projects?"*. The first time, Claude suggests folders to scan (the projects you've worked on with Claude, plus usual places like `~/Projects` or `Documents\GitHub`), you tick the ones you want, and it remembers them. Then it opens the page and talks you through what it found.
 
