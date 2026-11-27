@@ -2,6 +2,13 @@
 
 Each release is listed here, newest first. The Settings page shows the notes for a new version when you check for updates, so keep each entry short and in plain words.
 
+## 1.5.1
+
+- The numbers at the top sit in one panel, with a bar showing how full your disk is.
+- Labels such as Safe to remove, Worth a look and Used with Claude are now soft coloured pills, with no dot.
+- The summary cards line up at the top, so their numbers sit level.
+- Lighter grey panels, slightly smaller section headings and less space between the numbers and the cards.
+
 ## 1.5.0
 
 - A file type menu next to the project menu. It groups what the scan found (Documents, Images, Video, Audio, Design files, 3D, Archives, Code and more), and each group opens to show its file types, such as MOV or PDF. Only types that were found are listed.

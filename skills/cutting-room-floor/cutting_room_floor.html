@@ -9,7 +9,7 @@
 <style>
   /* Creative Mash site palette (creativemash.ie style guide) */
   :root {
-    --bg: #e6e6e4; --paper: #faf9f5; --ink: #1d1e1b; --muted: #5c5e56; --rule: #c9cac4; --hair: #e0e1da;
+    --bg: #e6e6e4; --panel: #f0f0ec; --paper: #faf9f5; --ink: #1d1e1b; --muted: #5c5e56; --rule: #c9cac4; --hair: #e0e1da;
     --sans: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
     --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     --ease: cubic-bezier(.22,1,.36,1);
@@ -60,16 +60,19 @@
   .lead code { font: 400 .8em var(--mono); color: var(--ink); }
 
   /* facts row */
-  .facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--rule); }
-  .facts div { padding: 18px 18px 4px 0; display: flex; flex-direction: column; gap: 8px; }
-  .facts div + div { padding-left: 18px; border-left: 1px solid var(--rule); }
-  .facts b { font-size: clamp(32px, 3.4vw, 54px); font-weight: 500; letter-spacing: -.045em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .facts { display: grid; grid-template-columns: minmax(0, 1.6fr) repeat(2, minmax(0, 1fr)); background: var(--panel); border-radius: 22px; padding: 22px 0; }
+  .facts > div { padding: 0 26px; display: flex; flex-direction: column; gap: 6px; justify-content: center; }
+  .facts > div + div { border-left: 1px solid var(--rule); }
+  .facts b { font-size: clamp(26px, 2.4vw, 36px); font-weight: 500; letter-spacing: -.04em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .facts b small { font-size: .5em; letter-spacing: -.01em; color: var(--muted); font-weight: 500; }
+  .dbar { display: block; height: 8px; margin-top: 6px; border-radius: 99px; background: var(--bg); overflow: hidden; }
+  .dbar i { display: block; height: 100%; border-radius: inherit; background: var(--ink); }
   .facts span { font: 400 13px var(--mono); color: var(--muted); }
 
   /* bold cards */
   .cards.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin: clamp(24px, 3vw, 44px) 0; }
-  .bold { position: relative; overflow: hidden; border-radius: 24px; padding: 26px 28px 28px; min-height: 0; display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; color: #fff; }
+  .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin: 20px 0 clamp(24px, 3vw, 44px); }
+  .bold { position: relative; overflow: hidden; border-radius: 24px; padding: 26px 28px 28px; min-height: 0; display: flex; flex-direction: column; justify-content: flex-start; gap: 10px; color: #fff; }
   .bold .mk { position: absolute; right: -14px; top: -14px; width: 104px; height: 104px; background: rgba(255,255,255,.22); }
   .bold .k { font: 400 13px var(--mono); opacity: .85; }
   .bold b { font-size: clamp(40px, 4vw, 64px); font-weight: 500; letter-spacing: -.045em; line-height: 1; font-variant-numeric: tabular-nums; }
@@ -80,11 +83,11 @@
   section.block { margin-bottom: clamp(56px, 7vw, 112px); }
   .cards ~ section.block:not(:last-of-type) { margin-bottom: clamp(24px, 3vw, 44px); }  /* results page: same rhythm as the cards above */
   .head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; margin-bottom: 22px; }
-  h2 { margin: 0; font-size: clamp(30px, 3.2vw, 50px); line-height: 1.04; letter-spacing: -.035em; font-weight: 500; }
+  h2 { margin: 0; font-size: clamp(28px, 2.7vw, 42px); line-height: 1.04; letter-spacing: -.035em; font-weight: 500; }
   .legend { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; color: var(--muted); }
   .legend span { display: inline-flex; align-items: center; gap: 8px; }
 
-  .chart { background: var(--bg); border-radius: 24px; padding: 14px 28px; }
+  .chart { background: var(--panel); border-radius: 24px; padding: 14px 28px; }
   .proj { display: grid; grid-template-columns: minmax(140px, 240px) 1fr 84px; gap: 20px; align-items: center; width: 100%; padding: 13px 0; border: 0; border-bottom: 1px solid var(--rule); background: none; text-align: left; cursor: pointer; }
   .proj:last-child { border-bottom: 0; }
   .proj .pn { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; font-size: 15px; letter-spacing: -.01em; }
@@ -146,6 +149,8 @@
   .nm .cnt { font: 400 13px var(--mono); color: var(--muted); letter-spacing: 0; }
   .tag { display: inline-flex; align-items: center; gap: 7px; font: 400 11.5px var(--mono); padding: 4px 10px 4px 8px; border-radius: 999px; background: var(--bg); color: var(--ink); letter-spacing: 0; }
   .tag .dot { width: 8px; height: 8px; }
+  .tag.tint { position: relative; isolation: isolate; background: none; padding: 4px 10px; }
+  .tag.tint::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: var(--tc); opacity: .25; }  /* a 25% wash of the label's colour */
   .pth { font: 400 12.5px/1.5 var(--mono); color: var(--muted); word-break: break-all; margin-top: 4px; }
   .no-notes #list .desc, .no-paths #list .pth, .no-thumbs #list .th { display: none; }
   .note { color: var(--muted); font-size: 15px; line-height: 1.45; margin-top: 8px; max-width: 60ch; }
@@ -297,7 +302,7 @@
     .updbar { display: grid; grid-template-columns: auto 1fr; gap: 10px 12px; border-radius: 18px; padding: 14px 16px; width: auto; } .updbar .dot { margin-top: 7px; } .updbar button { grid-column: 2; justify-self: start; }
     .crumb { display: none; } header.top .wrap { gap: 8px; }
     .cards, .cards.two { grid-template-columns: 1fr; }
-    .facts { grid-template-columns: 1fr 1fr; } .facts div:nth-child(3) { padding-left: 0; border-left: 0; }
+    .facts { grid-template-columns: 1fr 1fr; row-gap: 18px; } .facts .disk { grid-column: 1 / -1; } .facts > div:nth-child(2) { border-left: 0; }
     .proj { grid-template-columns: 110px 1fr 64px; gap: 12px; } td.act { display: none; } .chart { padding: 8px 18px; }
     .th { width: 52px; height: 52px; border-radius: 10px; } .itm { gap: 12px; } .pv .cap { flex-direction: column; align-items: flex-start; }
     footer .pill.hide-sm { display: none; }
@@ -557,6 +562,7 @@ const tilde = p => HOME_DIR && (p === HOME_DIR || p.startsWith(HOME_DIR + SEP)) 
 const credit = () => `<p class="credit">Cutting Room Floor is a free tool by <a href="https://creativemash.ie" target="_blank" rel="noopener">Creative Mash</a>. Use it at your own risk: check anything before you remove it.</p>`;
 const kindOf = it => it.kind === "media" ? (it.status === "unused" ? "unused" : "used") : it.kind;
 const dot = v => `<span class="dot" style="background:var(${v})"></span>`;
+const pill = (v, text) => `<span class="tag tint" style="--tc:var(${v})">${text}</span>`;
 
 async function get(url) {
   const r = await fetch(url, { headers: { "X-Token": TOKEN } });
@@ -608,7 +614,7 @@ async function openSetup(settings) {
   $("#settings").onclick = () => render();
   const picks = r.suggestions;
   const card = (s, suggested) => `<div class="pickbox"${suggested ? ' data-sugg="1"' : ""}><label class="pick"><input type="checkbox" value="${esc(s.path)}" ${s.checked ? "checked" : ""}>
-      <span class="pk"><span class="nm">${esc(s.name)}${s.claude ? `<span class="tag">${dot("--g-purple")}Used with Claude</span>` : ""}</span>
+      <span class="pk"><span class="nm">${esc(s.name)}${s.claude ? `${pill("--g-purple", "Used with Claude")}` : ""}</span>
       <span class="pth">${esc(s.display)}</span><span class="note">${esc(s.note || "")}</span></span></label>
       <button class="rm" type="button" aria-label="Remove ${esc(s.name)} from the list" title="Remove from the list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>`;
   const hide = new Set();
@@ -868,7 +874,8 @@ function render() {
     </div>
 
     <div class="facts">
-      <div><b>${fmt(D.disk.free)}</b><span>free of ${fmt(D.disk.total)} on this disk</span></div>
+      <div class="disk"><b>${fmt(D.disk.free)} <small>free</small></b><span>of ${fmt(D.disk.total)} on this disk · ${Math.round((1 - D.disk.free / D.disk.total) * 100)}% full</span>
+        <i class="dbar" role="img" aria-label="Disk ${Math.round((1 - D.disk.free / D.disk.total) * 100)}% full"><i style="width:${Math.max(1, (1 - D.disk.free / D.disk.total) * 100)}%"></i></i></div>
       <div><b>${fmt(t.projects)}</b><span>in ${projs.length} project folders</span></div>
       <div><b>${t.count}</b><span>things worth checking</span></div>
     </div>
@@ -1089,7 +1096,7 @@ function row(i, maxS) {
   const inside = fold && !sel.has(i.id) ? [...KIDS.values()].filter(k => k.parent === i.id && sel.has(k.id)).length : 0;
   return `<tr class="${g ? "gone" : ""}">
     <td class="ck"><input type="checkbox" aria-label="Select ${esc(i.name)}" data-id="${i.id}" ${sel.has(i.id) ? "checked" : ""} ${g || nb ? "disabled" : ""}></td>
-    <td>${pv ? `<div class="itm"><button class="th" data-pv="${i.id}" data-name="${esc(i.name)}" ${i.preview ? "data-pic" : ""} ${fold ? `data-fv="${i.id}"` : ""} aria-label="${fold ? `See the files in` : i.preview ? "Preview" : "Play"} ${esc(i.name)}">${i.preview ? ICON_PIC : ICON_FILM}</button><div>` : ""}<div class="nm"><span class="nmt" title="${esc(tilde(i.path) + "\n" + i.note)}">${esc(i.name)}</span>${i.count != null ? (fold ? `<button class="openfv" data-fv="${i.id}">${ICON_GRID}See all ${i.count} files</button>` : `<span class="cnt">${i.count} files</span>`) : ""}${inside ? `<span class="tag inside">${inside} ticked inside</span>` : ""}<span class="tag">${dot(col)}${label}</span>${nb ? `<span class="tag">${dot("--g-orange")}Can’t go to the ${esc(OS.bin)}</span>` : ""}</div>
+    <td>${pv ? `<div class="itm"><button class="th" data-pv="${i.id}" data-name="${esc(i.name)}" ${i.preview ? "data-pic" : ""} ${fold ? `data-fv="${i.id}"` : ""} aria-label="${fold ? `See the files in` : i.preview ? "Preview" : "Play"} ${esc(i.name)}">${i.preview ? ICON_PIC : ICON_FILM}</button><div>` : ""}<div class="nm"><span class="nmt" title="${esc(tilde(i.path) + "\n" + i.note)}">${esc(i.name)}</span>${i.count != null ? (fold ? `<button class="openfv" data-fv="${i.id}">${ICON_GRID}See all ${i.count} files</button>` : `<span class="cnt">${i.count} files</span>`) : ""}${inside ? `<span class="tag inside">${inside} ticked inside</span>` : ""}${pill(col, label)}${nb ? `${pill("--g-orange", `Can’t go to the ${esc(OS.bin)}`)}` : ""}</div>
       <div class="pth">${esc(tilde(i.path))}</div><div class="note desc">${esc(i.note)}</div>${nb ? `<div class="note"><b>${esc(i.no_bin)}</b></div>` : ""}${pv ? "</div></div>" : ""}</td>
     <td class="sz">${fmt(i.size)}<div class="mini" style="width:${Math.max(4, i.size / maxS * 100)}%"></div></td>
     <td class="act">${g ? `<span class="eyebrow">In the ${esc(OS.bin)}</span>` : `<button class="pill ring sm" data-rev="${i.id}">${esc(OS.reveal)} ${ICON_OUT}</button>`}</td></tr>`;
