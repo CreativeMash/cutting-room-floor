@@ -181,7 +181,7 @@
   .upd .notes { margin: 14px 0 0; padding: 14px 18px; border-radius: 14px; background: var(--paper); white-space: pre-wrap; font: 400 13.5px/1.6 var(--sans); color: var(--ink); }
   .upd ol { margin: 14px 0 0; padding-left: 22px; } .upd li { margin: 8px 0; } .upd li::marker { color: var(--muted); }
   .cmd { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
-  .cmd code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; padding: 10px 14px; border-radius: 12px; background: var(--paper); font: 400 13px var(--mono); }
+  .cmd code { flex: 1; min-width: 0; overflow-x: auto; white-space: pre; line-height: 1.7; padding: 10px 14px; border-radius: 12px; background: var(--paper); font: 400 13px var(--mono); }
   .updbar { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin: 0 0 18px; padding: 10px 10px 10px 18px; border-radius: 999px; background: var(--bg); font-weight: 500; width: fit-content; }
   .intro { padding: clamp(20px, 3vw, 44px) 0 clamp(28px, 3vw, 44px); }
   .intro h1 { max-width: 16ch; }
@@ -466,12 +466,12 @@ function shuffle(box) {
 $("#app").addEventListener("click", e => { const box = e.target.closest(".orns"); if (box) shuffle(box); });
 
 // ---- updates: never installed from here, only explained ----
-const cmd = c => `<div class="cmd"><code>${esc(c)}</code><button class="pill ghost sm" data-copy="${esc(c)}">Copy</button></div>`;
+const cmd = (...cs) => `<div class="cmd"><code>${cs.map(esc).join("\n")}</code><button class="pill ghost sm" data-copy="${esc(cs.join("; "))}">Copy</button></div>`;
 function updBox(u) {
   if (u.error) return `<div class="upd"><h3>${dot("--g-yellow")}Couldn’t check for updates</h3><p>${esc(u.error)}</p></div>`;
   if (!u.newer) return `<div class="upd"><h3>${dot("--g-green")}You’re up to date</h3><p>Version ${esc(u.current)} is the latest.</p></div>`;
   const steps = {
-    claude: `<li>Ask Claude to <b>update Cutting Room Floor</b>. Or run this in ${OS.name === "windows" ? "PowerShell" : "Terminal"}:${cmd("claude plugin update cutting-room-floor@creativemash")}</li>
+    claude: `<li>Ask Claude to <b>update Cutting Room Floor</b>. Or run this in ${OS.name === "windows" ? "PowerShell" : "Terminal"}:${cmd("claude plugin marketplace update creativemash", "claude plugin update cutting-room-floor@creativemash")}</li>
       <li>Start a new Claude session, then ask Claude to run Cutting Room Floor again.</li>`,
     git: `<li>Close this page, then run this in ${OS.name === "windows" ? "PowerShell" : "Terminal"}:${cmd(`git -C "${u.folder}" pull`)}</li>
       <li>Start Cutting Room Floor again.</li>`,
@@ -480,7 +480,7 @@ function updBox(u) {
   }[u.install] || "";
   return `<div class="upd"><h3>${dot("--g-pink")}Version ${esc(u.latest)} is available</h3>
     <p>You have ${esc(u.current)}. Nothing changes until you update.</p>
-    ${u.notes ? `<div class="notes">${esc(u.notes.replace(/^\s*[-*] /gm, "• "))}</div>` : ""}
+    ${u.notes ? `<div class="notes">${esc(u.notes.replace(/^\s*[-*] /gm, "• ")).replace(/^## *(.+)$/gm, "<b>Version $1</b>")}</div>` : ""}
     <ol>${steps}</ol>
     ${u.install === "claude" ? `<p>To get updates without asking, type <code>/plugin</code> in Claude Code in a terminal, open <b>Marketplaces</b>, pick <b>creativemash</b> and turn on auto-update.</p>` : ""}
   </div>`;

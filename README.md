@@ -36,9 +36,10 @@ Then start a new session and ask Claude in your own words, for example *"my Mac 
 
 Updates don't install themselves unless you switch that on. To check, open **Settings** in the page and press **Check for updates**, or just ask Claude to *"update Cutting Room Floor"*.
 
-To update by hand, run this in Terminal (or PowerShell), then start a new Claude session:
+To update by hand, run these two in Terminal (or PowerShell), in this order, then start a new Claude session. The first gets the latest list of versions; the second installs the newest one.
 
 ```bash
+claude plugin marketplace update creativemash
 claude plugin update cutting-room-floor@creativemash
 ```
 

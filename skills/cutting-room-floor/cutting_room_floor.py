@@ -924,8 +924,16 @@ def check_update() -> dict:
     notes = ""
     if newer:
         try:
-            m = re.search(r"^## *" + re.escape(latest) + r"[^\n]*\n(.*?)(?=^## |\Z)", fetch("/CHANGELOG.md"), re.S | re.M)
-            notes = m.group(1).strip()[:1500] if m else ""
+            # Every version since the one you have, newest first, so nothing is missed when you skip one.
+            parts = []
+            for v, body in re.findall(r"^## *(\d+(?:\.\d+)*)[^\n]*\n(.*?)(?=^## |\Z)", fetch("/CHANGELOG.md"), re.S | re.M):
+                if _vtuple(current) < _vtuple(v) <= _vtuple(latest) and body.strip():
+                    parts.append((v, body.strip()))
+            if len(parts) == 1:
+                notes = parts[0][1]
+            else:
+                notes = "\n\n".join(f"## {v}\n{b}" for v, b in parts)
+            notes = notes[:3000]
         except Exception:
             pass
     return dict(current=current, latest=latest, newer=newer, notes=notes, install=install_type(),

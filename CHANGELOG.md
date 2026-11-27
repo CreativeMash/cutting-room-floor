@@ -2,6 +2,11 @@
 
 Each release is listed here, newest first. The Settings page shows the notes for a new version when you check for updates, so keep each entry short and in plain words.
 
+## 1.2.4
+
+- The update steps include refreshing the list of versions first, so the Terminal command always installs the newest one.
+- If you skip versions, the update box lists what's new in each of them, not only the latest.
+
 ## 1.2.3
 
 - Check for updates sees a new version within a minute of its release. Before, it could say you were up to date for up to 5 minutes afterwards.
